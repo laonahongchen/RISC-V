@@ -38,6 +38,7 @@
 `define Funct3ANDI 3'b111
 
 //----------------------MemBus-----------------------------------
-`define InstAddrBus 32:0
+`define InstAddrBus 31:0
+`define InstBus 31:0
 
 `endif

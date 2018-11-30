@@ -17,5 +17,21 @@ module regfile (
 
 reg[`RegBus] regs[0:`RegNum - 1];
 
+always @ ( posedge clk ) begin
+    if(rst  == `RstDisable) begin
+        if((we == `WriteEnable) && (waddr != `RegNumLog2'h0)) begin
+            regs[waddr] <= wdata;
+        end
+    end
+end
+
+always @ ( * ) begin
+    if (rst == `RstEnable ) begin
+        rdata1 <= `ZeroWord;
+    end else if (raddr1 == `RegNumLog2'h0) begin
+        regs[raddr1] <= `ZeroWord;
+    end else if ((raddr1 == waddr))
+
+end
 
 endmodule // regfile

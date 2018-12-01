@@ -30,8 +30,28 @@ always @ ( * ) begin
         rdata1 <= `ZeroWord;
     end else if (raddr1 == `RegNumLog2'h0) begin
         regs[raddr1] <= `ZeroWord;
-    end else if ((raddr1 == waddr))
-
+    end else if ((raddr1 == waddr) && (we == `WriteEnable) && (re1 == `ReadEnable)) begin
+        rdata1 <= wdata;
+    end else if (re1 == `ReadEnable) begin
+        radat1 <= regs[addr1];
+    end else begin
+        rdata1 <= `ZeroWord;
+    end
 end
+
+always @ ( * ) begin
+    if (rst == `RstEnable ) begin
+        rdata2 <= `ZeroWord;
+    end else if (raddr2 == `RegNumLog2'h0) begin
+        regs[raddr2] <= `ZeroWord;
+    end else if ((raddr2 == waddr) && (we == `WriteEnable) && (re2 == `ReadEnable)) begin
+        rdata2 <= wdata;
+    end else if (re2 == `ReadEnable) begin
+        radat2 <= regs[addr2];
+    end else begin
+        rdata2 <= `ZeroWord;
+    end
+end
+
 
 endmodule // regfile

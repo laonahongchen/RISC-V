@@ -60,11 +60,38 @@ always @ ( * ) begin
                         reg1_addr_o <=  rs1;
                         reg2_addr_o <=  rs2;
                         imm <=          {20'h0, I_imm};
-
-
-
+                    end
+                    default: begin
+                    end
+                endcase
+            default: begin
+            end
+        endcase
     end
 end
 
+always @ ( * ) begin
+    if(rst == `RstEnable) begin
+        reg1_o <= `ZeroWord;
+    end else if (reg1_read_o == 1'b1)  begin
+        reg1_o <= reg1_data_i;
+    end else if (reg1_read_o == 1'b0) begin
+        reg1_o <= imm;
+    end else begin
+        reg1_o <= `ZeroWord;
+    end
+end
+
+always @ ( * ) begin
+    if(rst == `RstEnable) begin
+        reg2_o <= `ZeroWord;
+    end else if (reg2_read_o == 1'b1)  begin
+        reg2_o <= reg2_data_i;
+    end else if (reg2_read_o == 1'b0) begin
+        reg2_o <= imm;
+    end else begin
+        reg2_o <= `ZeroWord;
+    end
+end
 
 endmodule // id

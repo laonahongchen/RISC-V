@@ -1,3 +1,4 @@
+`include "defines.vh"
 module ex (
     input wire rst,
 
@@ -20,8 +21,14 @@ always @ ( * ) begin
         logicout <= `ZeroWord;
     end else begin
         case (aluop_i)
-            `EXE_OR_OP: begin
+            `EX_OR_OP: begin
                 logicout <= reg1_i | reg2_i;
+            end
+            `EX_XOR_OP: begin
+                logicout <= reg1_i ^ reg2_i;
+            end
+            `EX_AND_OP: begin
+                logicout <= reg1_i & reg2_i;
             end
             default: begin
             end
@@ -33,7 +40,7 @@ always @ ( * ) begin
     wd_o <= wd_i;
     wreg_o <= wreg_i;
     case (alusel_i)
-        `EXE_RES_LOGIC: begin
+        `EX_RES_LOGIC: begin
             wdata_o <= logicout;
         end
         default: begin

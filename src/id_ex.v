@@ -1,3 +1,4 @@
+`include "defines.vh"
 module id_ex (
     input wire clk,
     input wire rst,
@@ -14,13 +15,13 @@ module id_ex (
     output reg[`RegBus]     ex_reg1,
     output reg[`RegBus]     ex_reg2,
     output reg[`RegAddrBus] ex_wd,
-    output reg              ex_wreg,
+    output reg              ex_wreg
 );
 
 always @ ( posedge clk ) begin
     if(rst == `RstEnable) begin
-        ex_aluop <= `EXE_NOP_OP;
-        ex_alusel <= `EXE_RES_NOP;
+        ex_aluop <= `EX_NOP_OP;
+        ex_alusel <= `EX_RES_NOP;
         ex_reg1 <= `ZeroWord;
         ex_reg2 <= `ZeroWord;
         ex_wd <= `NOPRegAddr;

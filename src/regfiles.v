@@ -1,3 +1,5 @@
+`include "defines.vh"
+
 module regfile (
     input wire clk,
     input wire rst,
@@ -12,7 +14,7 @@ module regfile (
 
     input wire re2,
     input wire[`RegAddrBus] raddr2,
-    output reg[`RegBus] rdata2,
+    output reg[`RegBus] rdata2
 );
 
 reg[`RegBus] regs[0:`RegNum - 1];
@@ -33,7 +35,7 @@ always @ ( * ) begin
     end else if ((raddr1 == waddr) && (we == `WriteEnable) && (re1 == `ReadEnable)) begin
         rdata1 <= wdata;
     end else if (re1 == `ReadEnable) begin
-        radat1 <= regs[addr1];
+        rdata1 <= regs[raddr1];
     end else begin
         rdata1 <= `ZeroWord;
     end
@@ -47,7 +49,7 @@ always @ ( * ) begin
     end else if ((raddr2 == waddr) && (we == `WriteEnable) && (re2 == `ReadEnable)) begin
         rdata2 <= wdata;
     end else if (re2 == `ReadEnable) begin
-        radat2 <= regs[addr2];
+        rdata2 <= regs[raddr2];
     end else begin
         rdata2 <= `ZeroWord;
     end

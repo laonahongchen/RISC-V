@@ -1,4 +1,4 @@
-`include "defines.v"
+`include "defines.vh"
 
 module pc_reg(
     input wire clk,

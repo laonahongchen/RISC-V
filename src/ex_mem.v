@@ -1,3 +1,4 @@
+`include "defines.vh"
 module ex_mem (
     input wire clk,
     input wire rst,

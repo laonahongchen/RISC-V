@@ -1,3 +1,4 @@
+`include "defines.vh"
 module stall (
     input wire rst,
     input wire if_stall_req,

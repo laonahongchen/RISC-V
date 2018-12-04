@@ -55,11 +55,22 @@ always @ ( * ) begin
         reg2_read_o <=  1'b0;
         reg1_addr_o <=  `NOPRegAddr;
         reg2_addr_o <=  `NOPRegAddr;
-        imm <=          32'h0;
+        imm <=          `ZeroWord;
     end else begin
+        aluop_o <=      `EX_NOP_OP;
+        alusel_o <=     `EX_RES_NOP;
+        wd_o <=         `NOPRegAddr;
+        wreg_o <=       `WriteDisable;
+        instvalid <=    `InstInvalid;
+        reg1_read_o <=  1'b0;
+        reg2_read_o <=  1'b0;
+        reg1_addr_o <=  rs1;
+        reg2_addr_o <=  rs2;
+        reg2_addr_o <=  `NOPRegAddr;
+        imm <=          `ZeroWord;
         case (opcode)
             `OpLUI: begin
-                aluop_o <=      `EX_LUI_OP;
+                aluop_o <=      `EX_OR_OP;
                 alusel_o <=     `EX_RES_LOGIC;
                 wd_o <=         rd;
                 wreg_o <=       `WriteEnable;
@@ -244,7 +255,7 @@ always @ ( * ) begin
                         reg2_read_o <=  1'b0;
                         reg1_addr_o <=  rs1;
                         reg2_addr_o <=  rs2;
-                        imm <=          {20{I-imm[11]}, I_imm[11:0]};
+                        imm <=          {{20{I_imm[11]}}, I_imm[11:0]};
                     end
                     `Funct3SLTI: begin
                         aluop_o <=      `EX_AND_OP;
@@ -256,7 +267,7 @@ always @ ( * ) begin
                         reg2_read_o <=  1'b0;
                         reg1_addr_o <=  rs1;
                         reg2_addr_o <=  rs2;
-                        imm <=          {20{I-imm[11]}, I_imm[11:0]};
+                        imm <=          {{20{I_imm[11]}}, I_imm[11:0]};
                     end
                     default: begin
                     end

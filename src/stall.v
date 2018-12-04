@@ -12,19 +12,19 @@ module stall (
 
 always @ ( * ) begin
     if(rst) begin
-        stall <= `NoStall;
+        stall = `NoStall;
     end else if(wb_stall_req == `StallReq) begin
-        stall <= `WbStall;
+        stall = `WbStall;
     end else if(me_stall_req == `StallReq) begin
-        stall <= `MemStall;
+        stall = `MemStall;
     end else if(ex_stall_req == `StallReq) begin
-        stall <= `ExStall;
+        stall = `ExStall;
     end else if(id_stall_req == `StallReq) begin
-        stall <= `IdStall;
+        stall = `IdStall;
     end else if(if_stall_req == `StallReq) begin
-        stall <= `IfStall;
+        stall = `IfStall;
     end else begin
-        stall <= `NoStall;
+        stall = `NoStall;
     end
 end
 

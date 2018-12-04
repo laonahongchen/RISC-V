@@ -13,13 +13,13 @@ module mem (
 
 always @ ( * ) begin
     if(rst == `RstEnable) begin
-        wd_o <= `NOPRegAddr;
-        wreg_o <= `WriteDisable;
-        wdata_o <= `ZeroWord;
+        wd_o = `NOPRegAddr;
+        wreg_o = `WriteDisable;
+        wdata_o = `ZeroWord;
     end else begin
-        wd_o <= wd_i;
-        wreg_o <= wreg_i;
-        wdata_o <= wdata_i;
+        wd_o = wd_i;
+        wreg_o = wreg_i;
+        wdata_o = wdata_i;
     end
 
 end

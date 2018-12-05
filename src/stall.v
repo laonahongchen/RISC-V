@@ -7,7 +7,7 @@ module stall (
     input wire me_stall_req,
     input wire wb_stall_req,
 
-    output reg[4:0] stall
+    output reg[`StallBus] stall
 );
 
 always @ ( * ) begin

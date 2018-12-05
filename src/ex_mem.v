@@ -1,15 +1,17 @@
 `include "defines.vh"
 module ex_mem (
-    input wire clk,
-    input wire rst,
+    input wire                  clk,
+    input wire                  rst,
 
-    input wire[`RegAddrBus] ex_wd,
-    input wire          ex_wreg,
-    input wire[`RegBus] ex_wdata,
+    input wire[`RegAddrBus]     ex_wd,
+    input wire                  ex_wreg,
+    input wire[`RegBus]         ex_wdata,
 
-    output reg[`RegAddrBus] mem_wd,
-    output reg mem_wreg,
-    output reg[`RegBus] mem_wdata
+    input wire[`StallBus]       stall,
+
+    output reg[`RegAddrBus]     mem_wd,
+    output reg                  mem_wreg,
+    output reg[`RegBus]         mem_wdata
 );
 
 always @ ( posedge clk ) begin
@@ -17,7 +19,11 @@ always @ ( posedge clk ) begin
         mem_wd <= `NOPRegAddr;
         mem_wreg <= `WriteDisable;
         mem_wdata <= `ZeroWord;
-    end else begin
+    end else if (stall[3] == `Stop && stall[4] == `NoStop) begin
+        mem_wd <= `NOPRegAddr;
+        mem_wreg <= `WriteDisable;
+        mem_wdata <= `ZeroWord;
+    end else if(stall[3] == `NoStop) begin
         mem_wd <= ex_wd;
         mem_wreg <= ex_wrge;
         mem_wdata <= ex_wdata;

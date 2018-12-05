@@ -153,17 +153,15 @@
 `define InstBus         31:0
 
 
-
-
 //---------------------Stall -------------------------------------
 `define StallReq        1'b1
 `define StallNotReq     1'b0
-`define NoStall         5'b00000
-`define IfStall         5'b00011
-`define IdStall         5'b00111
-`define ExStall         5'b01111
-`define MemStall        5'b11111
-`define WbStall         5'b11111
-
+`define NoStall         6'b000000
+`define IfStall         6'b000011
+`define IdStall         6'b000111
+`define ExStall         6'b001111
+`define MemStall        6'b011111
+`define WbStall         6'b111111
+`define StallBus        5:0
 
 `endif

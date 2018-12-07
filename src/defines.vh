@@ -144,7 +144,7 @@
 `define EX_RES_LOGIC    3'b001
 `define EX_RES_SHIFT    3'b010
 `define EX_RES_ARITH    3'b011
-`define EX_RES_J_B      3'b100
+`define EX_RES_JAL      3'b100
 `define EX_RES_LD_ST    3'b101
 `define EX_RES_NOP      3'b000
 

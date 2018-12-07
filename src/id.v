@@ -27,6 +27,10 @@ module id (
     output reg[`RegAddrBus]     wd_o,
     output reg                  wreg_o,
 
+    output reg[`RegBus]         offset_o,
+
+    output reg                  b_flag_o,
+    output reg[`InstAddrBus]    b_target_o,
     output wire                 stall_req_o
 );
 
@@ -71,6 +75,108 @@ always @ ( * ) begin
         reg2_addr_o =  `NOPRegAddr;
         imm =          `ZeroWord;
         case (opcode)
+            `OpJAL: begin
+                aluop_o =      `EX_JAL_OP;
+                alusel_o =     `EX_RES_JAL;
+                wd_o =         `ZeroWord;
+                wreg_o =       `WriteEnable;
+                instvalid =    `Instvalid;
+                reg1_read_o =  1'b0;
+                reg2_read_o =  1'b0;
+                reg1_addr_o =  rs1;
+                reg2_addr_o =  rs2;
+                imm =          J_imm;
+            end
+            `OpJALR: begin
+                aluop_o =      `EX_JALR_OP;
+                alusel_o =     `EX_RES_JAL;
+                wd_o =         `ZeroWord;
+                wreg_o =       `WriteEnable;
+                instvalid =    `Instvalid;
+                reg1_read_o =  1'b0;
+                reg2_read_o =  1'b0;
+                reg1_addr_o =  rs1;
+                reg2_addr_o =  rs2;
+                imm =          {{20{I_imm[11]}},I_imm};
+            end
+            `OpBRANCH: begin
+                case (funct3)
+                    `Funct3BEQ: begin
+                        aluop_o =      `EX_BEQ_OP;
+                        alusel_o =     `EX_RES_NOP;
+                        wd_o =         `ZeroWord;
+                        wreg_o =       `WriteDisable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b1;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          SB_imm;
+                    end
+                    `Funct3BNE: begin
+                        aluop_o =      `EX_BNE_OP;
+                        alusel_o =     `EX_RES_NOP;
+                        wd_o =         `ZeroWord;
+                        wreg_o =       `WriteDisable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b1;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          SB_imm;
+                    end
+                    `Funct3BLT: begin
+                        aluop_o =      `EX_BLT_OP;
+                        alusel_o =     `EX_RES_NOP;
+                        wd_o =         `ZeroWord;
+                        wreg_o =       `WriteDisable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b1;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          SB_imm;
+                    end
+                    `Funct3BGE: begin
+                        aluop_o =      `EX_BGE_OP;
+                        alusel_o =     `EX_RES_NOP;
+                        wd_o =         `ZeroWord;
+                        wreg_o =       `WriteDisable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b1;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          SB_imm;
+                    end
+                    `Funct3BLTU: begin
+                        aluop_o =      `EX_BLTU_OP;
+                        alusel_o =     `EX_RES_NOP;
+                        wd_o =         `ZeroWord;
+                        wreg_o =       `WriteDisable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b1;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          SB_imm;
+                    end
+                    `Funct3BGEU: begin
+                        aluop_o =      `EX_BGEU_OP;
+                        alusel_o =     `EX_RES_NOP;
+                        wd_o =         `ZeroWord;
+                        wreg_o =       `WriteDisable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b1;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          SB_imm;
+                    end
+                    default: begin
+                    end
+                endcase
+            end
             `OpLUI: begin
                 aluop_o =      `EX_OR_OP;
                 alusel_o =     `EX_RES_LOGIC;
@@ -376,6 +482,14 @@ always @ ( * ) begin
         reg2_o = imm;
     end else begin
         reg2_o = `ZeroWord;
+    end
+end
+
+always @ ( * ) begin
+    if(rst == `RstEnable) begin
+        offset_o = `ZeroWord;
+    end else begin
+        offset_o = imm;
     end
 end
 

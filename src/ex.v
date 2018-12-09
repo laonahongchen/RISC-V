@@ -20,6 +20,8 @@ module ex (
     output reg                  b_flag_o,
     output wire[`InstAddrBus]   b_target_o,
 
+    output wire[`AluOpBus]      aluop_o,
+    output wire[`RegBus]        mem_addr_o
 );
 
 reg[`RegBus] logicout;
@@ -138,25 +140,38 @@ end
 
 
 always @ ( * ) begin
-    wd_o <= wd_i;
-    wreg_o <= wreg_i;
-    case (alusel_i)
-        `EX_RES_JAL: begin
-            wdata_o = pcout;
-        end
-        `EX_RES_LOGIC: begin
-            wdata_o = logicout;
-        end
-        `EX_RES_SHIFT: begin
-            wdata_o = shiftout;
-        end
-        `EX_RES_ARITH: begin
-            wdata_o = arithout;
-        end
-        default: begin
-            wdata_o = `ZeroWord;
-        end
-    endcase
+    if(wreg_i && !wd_i) begin
+        wd_o <= `ZeroWord;
+        wreg_o <= `WriteDisable;
+        wdata_o <= `ZeroWord;
+        aluop_o = `ME_NOP_OP;
+    end else begin
+        wd_o = wd_i;
+        wreg_o = wreg_i;
+        aluop_o = `ME_NOP_OP;
+        case (alusel_i)
+            `EX_RES_JAL: begin
+                wdata_o = pcout;
+            end
+            `EX_RES_LOGIC: begin
+                wdata_o = logicout;
+            end
+            `EX_RES_SHIFT: begin
+                wdata_o = shiftout;
+            end
+            `EX_RES_ARITH: begin
+                wdata_o = arithout;
+            end
+            `EX_RES_LD_ST: begin
+                aluop_o = aluop_i;
+                mem_addr = reg1_i + offset_i;
+                w_data_o = r2_data_i;
+            end
+            default: begin
+                wdata_o = `ZeroWord;
+            end
+        endcase
+    end
 end
 
 endmodule // ex

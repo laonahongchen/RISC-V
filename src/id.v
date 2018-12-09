@@ -15,6 +15,8 @@ module id (
     input wire[`RegBus]         mem_wdata_i,
     input wire[`RegAddrBus]     mem_wd_i,
 
+    output                      pc_o,
+
     output reg                  reg1_read_o,
     output reg                  reg2_read_o,
     output reg[`RegAddrBus]     reg1_addr_o,
@@ -51,6 +53,7 @@ reg instvalid;
 
 //----------------------------decodeing----------------------------------------
 always @ ( * ) begin
+    pc_o = pc_i;
     if(rst == `RstEnable) begin
         aluop_o =      `EX_NOP_OP;
         alusel_o =     `EX_RES_NOP;
@@ -75,22 +78,127 @@ always @ ( * ) begin
         reg2_addr_o =  `NOPRegAddr;
         imm =          `ZeroWord;
         case (opcode)
+            `OpSTORE: begin
+                case (funct3)
+                    `Funct3SB: begin
+                        aluop_o =      `EX_SB_OP;
+                        alusel_o =     `EX_RES_LD_ST;
+                        wd_o =         rd;
+                        wreg_o =       `WriteEnable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b1;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          {{20{S_imm[11]}},S_imm[11:0]};
+                    end
+                    `Funct3SH: begin
+                        aluop_o =      `EX_SH_OP;
+                        alusel_o =     `EX_RES_LD_ST;
+                        wd_o =         rd;
+                        wreg_o =       `WriteEnable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b1;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          {{20{S_imm[11]}},S_imm[11:0]};
+                    end
+                    `Funct3SB: begin
+                        aluop_o =      `EX_SW_OP;
+                        alusel_o =     `EX_RES_LD_ST;
+                        wd_o =         rd;
+                        wreg_o =       `WriteEnable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b1;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          {{20{S_imm[11]}},S_imm[11:0]};
+                endcase
+            end
+            `OpLOAD: begin
+                case (funct3)
+                    `Funct3LB: begin
+                        aluop_o =      `EX_LB_OP;
+                        alusel_o =     `EX_RES_LD_ST;
+                        wd_o =         rd;
+                        wreg_o =       `WriteEnable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b0;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          {{20{I_imm[11]}},I_imm[11:0]};
+                    end
+                    `Funct3LH: begin
+                        aluop_o =      `EX_LH_OP;
+                        alusel_o =     `EX_RES_LD_ST;
+                        wd_o =         rd;
+                        wreg_o =       `WriteEnable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b0;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          {{20{I_imm[11]}},I_imm[11:0]};
+                    end
+                    `Funct3LW: begin
+                        aluop_o =      `EX_LW_OP;
+                        alusel_o =     `EX_RES_LD_ST;
+                        wd_o =         rd;
+                        wreg_o =       `WriteEnable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b0;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          {{20{I_imm[11]}},I_imm[11:0]};
+                    end
+                    `Funct3LBU: begin
+                        aluop_o =      `EX_LBU_OP;
+                        alusel_o =     `EX_RES_LD_ST;
+                        wd_o =         rd;
+                        wreg_o =       `WriteEnable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b0;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          {{20{I_imm[11]}},I_imm[11:0]};
+                    end
+                    `Funct3LWU: begin
+                        aluop_o =      `EX_LWU_OP;
+                        alusel_o =     `EX_RES_LD_ST;
+                        wd_o =         rd;
+                        wreg_o =       `WriteEnable;
+                        instvalid =    `Instvalid;
+                        reg1_read_o =  1'b1;
+                        reg2_read_o =  1'b0;
+                        reg1_addr_o =  rs1;
+                        reg2_addr_o =  rs2;
+                        imm =          {{20{I_imm[11]}},I_imm[11:0]};
+                    end
+                    default: begin
+                    end
+                endcase
+            end
             `OpJAL: begin
                 aluop_o =      `EX_JAL_OP;
                 alusel_o =     `EX_RES_JAL;
-                wd_o =         `ZeroWord;
+                wd_o =         rd;
                 wreg_o =       `WriteEnable;
                 instvalid =    `Instvalid;
                 reg1_read_o =  1'b0;
                 reg2_read_o =  1'b0;
                 reg1_addr_o =  rs1;
                 reg2_addr_o =  rs2;
-                imm =          J_imm;
+                imm =          {{12{UJ_imm[11]}},UJ_imm};
             end
             `OpJALR: begin
                 aluop_o =      `EX_JALR_OP;
                 alusel_o =     `EX_RES_JAL;
-                wd_o =         `ZeroWord;
+                wd_o =         rd;
                 wreg_o =       `WriteEnable;
                 instvalid =    `Instvalid;
                 reg1_read_o =  1'b0;
@@ -104,74 +212,74 @@ always @ ( * ) begin
                     `Funct3BEQ: begin
                         aluop_o =      `EX_BEQ_OP;
                         alusel_o =     `EX_RES_NOP;
-                        wd_o =         `ZeroWord;
+                        wd_o =         rd;
                         wreg_o =       `WriteDisable;
                         instvalid =    `Instvalid;
                         reg1_read_o =  1'b1;
                         reg2_read_o =  1'b1;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          SB_imm;
+                        imm =          {{20{SB_imm[11]}},SB_imm};
                     end
                     `Funct3BNE: begin
                         aluop_o =      `EX_BNE_OP;
                         alusel_o =     `EX_RES_NOP;
-                        wd_o =         `ZeroWord;
+                        wd_o =         rd;
                         wreg_o =       `WriteDisable;
                         instvalid =    `Instvalid;
                         reg1_read_o =  1'b1;
                         reg2_read_o =  1'b1;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          SB_imm;
+                        imm =          {{20{SB_imm[11]}},SB_imm};
                     end
                     `Funct3BLT: begin
                         aluop_o =      `EX_BLT_OP;
                         alusel_o =     `EX_RES_NOP;
-                        wd_o =         `ZeroWord;
+                        wd_o =         rd;
                         wreg_o =       `WriteDisable;
                         instvalid =    `Instvalid;
                         reg1_read_o =  1'b1;
                         reg2_read_o =  1'b1;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          SB_imm;
+                        imm =          {{20{SB_imm[11]}},SB_imm};
                     end
                     `Funct3BGE: begin
                         aluop_o =      `EX_BGE_OP;
                         alusel_o =     `EX_RES_NOP;
-                        wd_o =         `ZeroWord;
+                        wd_o =         rd;
                         wreg_o =       `WriteDisable;
                         instvalid =    `Instvalid;
                         reg1_read_o =  1'b1;
                         reg2_read_o =  1'b1;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          SB_imm;
+                        imm =          {{20{SB_imm[11]}},SB_imm};
                     end
                     `Funct3BLTU: begin
                         aluop_o =      `EX_BLTU_OP;
                         alusel_o =     `EX_RES_NOP;
-                        wd_o =         `ZeroWord;
+                        wd_o =         rd;
                         wreg_o =       `WriteDisable;
                         instvalid =    `Instvalid;
                         reg1_read_o =  1'b1;
                         reg2_read_o =  1'b1;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          SB_imm;
+                        imm =          {{20{SB_imm[11]}},SB_imm};
                     end
                     `Funct3BGEU: begin
                         aluop_o =      `EX_BGEU_OP;
                         alusel_o =     `EX_RES_NOP;
-                        wd_o =         `ZeroWord;
+                        wd_o =         rd;
                         wreg_o =       `WriteDisable;
                         instvalid =    `Instvalid;
                         reg1_read_o =  1'b1;
                         reg2_read_o =  1'b1;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          SB_imm;
+                        imm =          {{20{SB_imm[11]}},SB_imm};
                     end
                     default: begin
                     end
@@ -187,7 +295,7 @@ always @ ( * ) begin
                 reg2_read_o =  1'b0;
                 reg1_addr_o =  rs1;
                 reg2_addr_o =  rs2;
-                imm =          U_imm;
+                imm =          {U_imm,12'h0};
             end
             `OpOP: begin
                 case(funct3)
@@ -381,7 +489,7 @@ always @ ( * ) begin
                         reg2_read_o =  1'b0;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          {20'h0, I_imm};
+                        imm =          {{20{I_imm[11]}}, I_imm[11:0]};
                     end
                     `Funct3XORI: begin
                         aluop_o =      `EX_XOR_OP;
@@ -393,7 +501,7 @@ always @ ( * ) begin
                         reg2_read_o =  1'b0;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          {20'h0, I_imm};
+                        imm =          {{20{I_imm[11]}}, I_imm[11:0]};
                     end
                     `Funct3ANDI: begin
                         aluop_o =      `EX_AND_OP;
@@ -405,7 +513,7 @@ always @ ( * ) begin
                         reg2_read_o =  1'b0;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          {20'h0, I_imm};
+                        imm =          {{20{I_imm[11]}}, I_imm[11:0]};
                     end
                     `Funct3ADDI: begin
                         aluop_o =      `EX_ADD_OP;

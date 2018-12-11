@@ -151,7 +151,7 @@
 //----------------------MemBus-----------------------------------
 `define InstAddrBus     31:0
 `define InstBus         31:0
-
+`define MemBus          31:0
 
 //---------------------Stall -------------------------------------
 `define StallReq        1'b1
@@ -161,6 +161,7 @@
 `define IdStall         6'b000111
 `define ExStall         6'b001111
 `define MemStall        6'b011111
+`define AllStall        6'b111111
 //`define WbStall         6'b111111
 `define StallBus        5:0
 

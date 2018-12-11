@@ -1,6 +1,6 @@
 `include "defines.vh"
 module id (
-    input wire rst,
+    input wire                  rst,
     input wire[`InstAddrBus]    pc_i,
     input wire[`InstBus]        inst_i,
 
@@ -15,7 +15,7 @@ module id (
     input wire[`RegBus]         mem_wdata_i,
     input wire[`RegAddrBus]     mem_wd_i,
 
-    output                      pc_o,
+    output reg                  pc_o,
 
     output reg                  reg1_read_o,
     output reg                  reg2_read_o,
@@ -115,6 +115,7 @@ always @ ( * ) begin
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
                         imm =          {{20{S_imm[11]}},S_imm[11:0]};
+                    end
                 endcase
             end
             `OpLOAD: begin
@@ -167,8 +168,8 @@ always @ ( * ) begin
                         reg2_addr_o =  rs2;
                         imm =          {{20{I_imm[11]}},I_imm[11:0]};
                     end
-                    `Funct3LWU: begin
-                        aluop_o =      `EX_LWU_OP;
+                    `Funct3LHU: begin
+                        aluop_o =      `EX_LHU_OP;
                         alusel_o =     `EX_RES_LD_ST;
                         wd_o =         rd;
                         wreg_o =       `WriteEnable;

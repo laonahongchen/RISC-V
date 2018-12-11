@@ -18,54 +18,56 @@ module ex (
     output reg                  stall_req_o,
 
     output reg                  b_flag_o,
-    output wire[`InstAddrBus]   b_target_o,
+    output reg[`InstAddrBus]   b_target_o,
 
-    output wire[`AluOpBus]      aluop_o,
-    output wire[`RegBus]        mem_addr_o
+    output reg[`AluOpBus]      aluop_o,
+    output reg[`RegBus]        mem_addr_o
 );
 
 reg[`RegBus] logicout;
 reg[`RegBus] shiftout;
 reg[`RegBus] arithout;
-reg[`RegBus] pcout = pc_i + 4;
+reg[`RegBus] pcout;
+reg[`RegBus] sumres;
 
 always @ ( * ) begin
     if(rst == `RstEnable) begin
         b_flag_o = 1'b0;
         b_target_o = `ZeroWord;
     end else begin
-        b_flag_o = 1'b0;
-        b_target_o = `ZeroWord;
         case (aluop_i)
             `EX_JALR_OP: begin
                 b_flag_o = 1'b1;
-                b_target_o = {(r1_data_i + r2_data_i)[31:1], 1'b0};
+                sumres = reg1_i + reg2_i;
+                b_target_o = {sumres[31:1], 1'b0};
             end
             `EX_BNE_OP:  begin
-                b_flag_o = ~(r1_data_i == r2_data_i);
-                b_target_o = pc_o + offset_i;
+                b_flag_o = ~(reg1_i == reg2_i);
+                b_target_o = pc_i + offset_i;
             end
             `EX_BEQ_OP: begin
-                b_flag_o = (r1_data_i == r2_data_i);
-                b_target_o = pc_o + offset_i;
+                b_flag_o = (reg1_i == reg2_i);
+                b_target_o = pc_i + offset_i;
             end
             `EX_BLT_OP: begin
-                b_flag_o = ($signed(r1_data_i) < $signed(r2_data_i));
-                b_target_o = pc_o + offset_i;
+                b_flag_o = ($signed(reg1_i) < $signed(reg2_i));
+                b_target_o = pc_i + offset_i;
             end
             `EX_BGE_OP: begin
-                b_flag_o = ($signed(r1_data_i) > $signed(r2_data_i));
-                b_target_o = pc_o + offset_i;
+                b_flag_o = ($signed(reg1_i) > $signed(reg2_i));
+                b_target_o = pc_i + offset_i;
             end
             `EX_BLTU_OP: begin
-                b_flag_o = ((r1_data_i) < (r2_data_i));
-                b_target_o = pc_o + offset_i;
+                b_flag_o = ((reg1_i) < (reg2_i));
+                b_target_o = pc_i + offset_i;
             end
             `EX_BGEU_OP: begin
-                b_flag_o = ((r1_data_i) > (r2_data_i));
-                b_target_o = pc_o + offset_i;
+                b_flag_o = ((reg1_i) > (reg2_i));
+                b_target_o = pc_i + offset_i;
             end
             default: begin
+                b_flag_o = 1'b0;
+                b_target_o = `ZeroWord;
             end
         endcase
     end
@@ -122,7 +124,7 @@ always @ ( * ) begin
                 arithout = reg1_i + reg2_i;
             end
             `EX_SUB_OP: begin
-                arithout = reg1_i - re2_i;
+                arithout = reg1_i - reg2_i;
             end
             `EX_SLT_OP: begin
                 arithout = $signed(reg1_i) < $signed(reg2_i);
@@ -151,7 +153,7 @@ always @ ( * ) begin
         aluop_o = `ME_NOP_OP;
         case (alusel_i)
             `EX_RES_JAL: begin
-                wdata_o = pcout;
+                wdata_o = pc_i + 4;
             end
             `EX_RES_LOGIC: begin
                 wdata_o = logicout;
@@ -164,8 +166,8 @@ always @ ( * ) begin
             end
             `EX_RES_LD_ST: begin
                 aluop_o = aluop_i;
-                mem_addr = reg1_i + offset_i;
-                w_data_o = r2_data_i;
+                mem_addr_o = reg1_i + offset_i;
+                wdata_o = reg2_i;
             end
             default: begin
                 wdata_o = `ZeroWord;

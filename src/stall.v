@@ -1,11 +1,12 @@
 `include "defines.vh"
-module stall (
+module stall_ctrl (
     input wire rst,
+    input wire rdy_in,
     input wire if_stall_req,
     input wire id_stall_req,
     input wire ex_stall_req,
     input wire me_stall_req,
-    input wire wb_stall_req,
+    //input wire wb_stall_req,
 
     output reg[`StallBus] stall
 );
@@ -13,8 +14,10 @@ module stall (
 always @ ( * ) begin
     if(rst) begin
         stall = `NoStall;
-    end else if(wb_stall_req == `StallReq) begin
-        stall = `WbStall;
+    end else if(rdy_in == 1'b0) begin
+        stall = `AllStall;
+    //end else if(wb_stall_req == `StallReq) begin
+    //    stall = `WbStall;
     end else if(me_stall_req == `StallReq) begin
         stall = `MemStall;
     end else if(ex_stall_req == `StallReq) begin

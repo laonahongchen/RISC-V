@@ -7,7 +7,7 @@ module mem (
     input wire[`RegBus]     wdata_i,
 
     input wire[`AluOpBus]   aluop_i,
-    input wire[`MemBus]     mem_addr_i,
+    //input wire[`MemBus]     mem_addr_i,
 
     input wire[`RegBus]     ram_r_data_i,
 
@@ -18,14 +18,14 @@ module mem (
 
     output reg[`RegAddrBus] wd_o,
     output reg              wreg_o,
-    output reg[`RegBus]     wdata_o
+    output reg[`RegBus]     wdata_o,
     output reg              stall_req_o,
     output reg              ram_r_enable_o,
 
     output reg[`RegBus]     ram_addr_o,
     output reg              ram_w_enable_o,
     output reg[`RegBus]     ram_w_data_o,
-    output reg[1:0]         ram_mask_o,
+    output reg[1:0]         ram_mask_o
 );
 
 always @ ( * ) begin
@@ -148,19 +148,19 @@ always @ ( * ) begin
                 `EX_SB_OP: begin
                     ram_w_enable_o = `WriteEnable;
                     ram_addr_o = ram_addr_i;
-                    ram_w_data_o = {4{w_data_i[7:0]}};
+                    ram_w_data_o = {4{ram_r_data_i[7:0]}};
                     ram_mask_o = 2'b01;
                 end
                 `EX_SH_OP: begin
                     ram_w_enable_o = `WriteEnable;
                     ram_addr_o = ram_addr_i;
-                    ram_w_data_o = {2{w_data_i[15:0]}};
+                    ram_w_data_o = {2{ram_r_data_i[15:0]}};
                     ram_mask_o = 2'b10;
                 end
                 `EX_SW_OP: begin
                     ram_w_enable_o = `WriteEnable;
                     ram_addr_o = ram_addr_i;
-                    ram_w_data_o = w_data_i;
+                    ram_w_data_o = ram_r_data_i;
                     ram_mask_o = 2'b11;
                 end
             endcase

@@ -35,7 +35,7 @@ always @ ( posedge clk ) begin
         mem_mem_addr <= `ZeroWord;
     end else if(stall[3] == `NoStop) begin
         mem_wd <= ex_wd;
-        mem_wreg <= ex_wrge;
+        mem_wreg <= ex_wreg;
         mem_wdata <= ex_wdata;
         mem_mem_addr <= ex_mem_addr;
         mem_aluop <= ex_aluop;

@@ -46,7 +46,7 @@ always @ ( * ) begin
     end
 end
 
-always @ ( posedge clk ) begin
+always @ ( negedge clk ) begin
     if (ce == `ChipsDisable)  begin
         pc <= `ZeroWord;
     end else if (id_b_flag_i) begin

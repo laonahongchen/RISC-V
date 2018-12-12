@@ -6,5 +6,6 @@ for x in range(4):
 	#print(x)
 	#print(a[x])
 	b = int(a[x], 16)
+	#print(b)
 	#c = int(str(b), 2)
-	print('{:04b}'.format(b), end="")
+	print('{:08b}'.format(b), end="")

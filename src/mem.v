@@ -34,6 +34,7 @@ always @ ( * ) begin
         wreg_o = `WriteDisable;
         wdata_o = `ZeroWord;
         ram_r_enable_o = 1'b0;
+        ram_w_enable_o = 1'b0;
         stall_req_o = `NoStop;
         ram_w_data_o = `ZeroWord;
         ram_addr_o = `ZeroWord;
@@ -45,6 +46,7 @@ always @ ( * ) begin
                 wreg_o = wreg_i;
                 wdata_o = wdata_i;
                 ram_r_enable_o = 1'b0;
+                ram_w_enable_o = 1'b0;
                 stall_req_o = `NoStop;
                 ram_w_data_o = `ZeroWord;
                 ram_addr_o = `ZeroWord;
@@ -61,6 +63,7 @@ always @ ( * ) begin
         ram_r_enable_o = 1'b0;
         stall_req_o = `NoStop;
         ram_w_data_o = `ZeroWord;
+        ram_w_enable_o = 1'b0;
         ram_addr_o = `ZeroWord;
         ram_mask_o = 4'h0;
         if(ram_done) begin

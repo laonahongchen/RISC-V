@@ -1,28 +1,28 @@
 `include "defines.vh"
 module id_ex (
-    input wire              clk,
-    input wire              rst,
+    input wire                  clk,
+    input wire                  rst,
 
-    input wire[`AluOpBus]   id_aluop,
-    input wire[`AluSelBus]  id_alusel,
-    input wire[`RegBus]     id_reg1,
-    input wire[`RegBus]     id_reg2,
-    input wire[`RegAddrBus] id_wd,
-    input wire              id_wreg,
-    input wire              id_pc,
-    input wire[`RegBus]     id_offset,
+    input wire[`AluOpBus]       id_aluop,
+    input wire[`AluSelBus]      id_alusel,
+    input wire[`RegBus]         id_reg1,
+    input wire[`RegBus]         id_reg2,
+    input wire[`RegAddrBus]     id_wd,
+    input wire                  id_wreg,
+    input wire[`InstAddrBus]    id_pc,
+    input wire[`RegBus]         id_offset,
 
-    input wire[`StallBus]   stall,
-    input wire              ex_b_flag_i,
+    input wire[`StallBus]       stall,
+    input wire                  ex_b_flag_i,
 
-    output reg[`AluOpBus]   ex_aluop,
-    output reg[`AluSelBus]  ex_alusel,
-    output reg[`RegBus]     ex_reg1,
-    output reg[`RegBus]     ex_reg2,
-    output reg[`RegAddrBus] ex_wd,
-    output reg              ex_wreg,
-    output reg              ex_pc,
-    output reg[`RegBus]     ex_offset
+    output reg[`AluOpBus]       ex_aluop,
+    output reg[`AluSelBus]      ex_alusel,
+    output reg[`RegBus]         ex_reg1,
+    output reg[`RegBus]         ex_reg2,
+    output reg[`RegAddrBus]     ex_wd,
+    output reg                  ex_wreg,
+    output reg[`InstAddrBus]    ex_pc,
+    output reg[`RegBus]         ex_offset
 );
 
 reg next_jump;

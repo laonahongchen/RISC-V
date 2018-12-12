@@ -18,10 +18,11 @@ module ex (
     output reg                  stall_req_o,
 
     output reg                  b_flag_o,
-    output reg[`InstAddrBus]   b_target_o,
+    output reg[`InstAddrBus]    b_target_o,
 
-    output reg[`AluOpBus]      aluop_o,
-    output reg[`RegBus]        mem_addr_o
+    output reg[`AluOpBus]       aluop_o,
+    output reg[`RegBus]         mem_addr_o,
+    output reg                  is_ld
 );
 
 reg[`RegBus] logicout;
@@ -31,6 +32,7 @@ reg[`RegBus] pcout;
 reg[`RegBus] sumres;
 
 always @ ( * ) begin
+    stall_req_o = 1'b0;
     if(rst == `RstEnable) begin
         b_flag_o = 1'b0;
         b_target_o = `ZeroWord;
@@ -117,6 +119,26 @@ end
 
 always @ ( * ) begin
     if(rst == `RstEnable) begin
+        mem_addr_o = `ZeroWord;
+        is_ld = 1'b0;
+    end else begin
+        case(aluop_i)
+        `EX_SH_OP, `EX_SB_OP, `EX_SW_OP: begin
+        //if(alusel_i == EX_RES_LD_ST) begin
+            mem_addr_o = reg1_i + offset_i;
+            is_ld = 1'b1;
+        end
+        default: begin
+            mem_addr_o = `ZeroWord;
+            is_ld = 1'b0;
+        end
+        endcase
+        //end
+    end
+end
+
+always @ ( * ) begin
+    if(rst == `RstEnable) begin
         arithout <= `ZeroWord;
     end else begin
         case(aluop_i)
@@ -150,27 +172,33 @@ always @ ( * ) begin
     end else begin
         wd_o = wd_i;
         wreg_o = wreg_i;
-        aluop_o = `ME_NOP_OP;
+        //$display(alusel_i);
         case (alusel_i)
             `EX_RES_JAL: begin
                 wdata_o = pc_i + 4;
+                aluop_o = `ME_NOP_OP;
             end
             `EX_RES_LOGIC: begin
                 wdata_o = logicout;
+                aluop_o = `ME_NOP_OP;
             end
             `EX_RES_SHIFT: begin
                 wdata_o = shiftout;
+                aluop_o = `ME_NOP_OP;
             end
             `EX_RES_ARITH: begin
                 wdata_o = arithout;
+                aluop_o = `ME_NOP_OP;
             end
             `EX_RES_LD_ST: begin
+
+        //        $display("hello, world!");
                 aluop_o = aluop_i;
-                mem_addr_o = reg1_i + offset_i;
                 wdata_o = reg2_i;
             end
             default: begin
                 wdata_o = `ZeroWord;
+                aluop_o = `ME_NOP_OP;
             end
         endcase
     end

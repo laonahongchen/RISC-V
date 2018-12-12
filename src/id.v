@@ -7,6 +7,7 @@ module id (
     input wire[`RegBus]         reg1_data_i,
     input wire[`RegBus]         reg2_data_i,
 
+    input wire                  ex_ld_flag,
     input wire                  ex_wreg_i,
     input wire[`RegBus]         ex_wdata_i,
     input wire[`RegAddrBus]     ex_wd_i,
@@ -33,7 +34,7 @@ module id (
 
     output reg                  b_flag_o,
     output reg[`InstAddrBus]    b_target_o,
-    output wire                 stall_req_o
+    output reg                  stall_req_o
 );
 
 wire[6:0] opcode =  inst_i[6:0];
@@ -46,7 +47,7 @@ wire[11:0] I_imm =  inst_i[31:20];
 wire[11:0] S_imm =  {inst_i[31:25], inst_i[11:7]};
 wire[11:0] SB_imm = {inst_i[31],inst_i[7],inst_i[30:25],inst_i[11:8]};
 wire[19:0] U_imm =  inst_i[31:12];
-wire[19:0] UJ_imm = {inst_i[31], inst_i[19:12],inst_i[30:21],inst_i[20]};
+wire[19:0] UJ_imm = {inst_i[31], inst_i[19:12],inst_i[20],inst_i[30:21]};
 reg[31:0] imm;
 //reg[31:0] imm2;
 reg instvalid;
@@ -54,6 +55,7 @@ reg instvalid;
 //----------------------------decodeing----------------------------------------
 always @ ( * ) begin
     pc_o = pc_i;
+    //stall_req_o = 1'b0;
     if(rst == `RstEnable) begin
         aluop_o =      `EX_NOP_OP;
         alusel_o =     `EX_RES_NOP;
@@ -77,6 +79,8 @@ always @ ( * ) begin
         reg2_addr_o =  rs2;
         reg2_addr_o =  `NOPRegAddr;
         imm =          `ZeroWord;
+        b_flag_o =     1'b0;
+        b_target_o =   `ZeroWord;
         case (opcode)
             `OpSTORE: begin
                 case (funct3)
@@ -84,7 +88,7 @@ always @ ( * ) begin
                         aluop_o =      `EX_SB_OP;
                         alusel_o =     `EX_RES_LD_ST;
                         wd_o =         rd;
-                        wreg_o =       `WriteEnable;
+                        wreg_o =       `WriteDisable;
                         instvalid =    `Instvalid;
                         reg1_read_o =  1'b1;
                         reg2_read_o =  1'b1;
@@ -96,7 +100,7 @@ always @ ( * ) begin
                         aluop_o =      `EX_SH_OP;
                         alusel_o =     `EX_RES_LD_ST;
                         wd_o =         rd;
-                        wreg_o =       `WriteEnable;
+                        wreg_o =       `WriteDisable;
                         instvalid =    `Instvalid;
                         reg1_read_o =  1'b1;
                         reg2_read_o =  1'b1;
@@ -108,7 +112,7 @@ always @ ( * ) begin
                         aluop_o =      `EX_SW_OP;
                         alusel_o =     `EX_RES_LD_ST;
                         wd_o =         rd;
-                        wreg_o =       `WriteEnable;
+                        wreg_o =       `WriteDisable;
                         instvalid =    `Instvalid;
                         reg1_read_o =  1'b1;
                         reg2_read_o =  1'b1;
@@ -194,7 +198,9 @@ always @ ( * ) begin
                 reg2_read_o =  1'b0;
                 reg1_addr_o =  rs1;
                 reg2_addr_o =  rs2;
-                imm =          {{12{UJ_imm[11]}},UJ_imm};
+                imm =          {{11{UJ_imm[19]}},UJ_imm,1'h0};
+                b_flag_o =     1'b1;
+                b_target_o =   pc_i + {{11{UJ_imm[19]}},UJ_imm,1'h0};
             end
             `OpJALR: begin
                 aluop_o =      `EX_JALR_OP;
@@ -562,36 +568,61 @@ always @ ( * ) begin
     end
 end
 
+reg r1_stall;
+reg r2_stall;
+
 always @ ( * ) begin
     if(rst == `RstEnable) begin
         reg1_o = `ZeroWord;
+        r1_stall = 1'b0;
+    end else if ((reg1_read_o == 1'b1) && (ex_ld_flag) && (ex_wd_i == reg1_addr_o)) begin
+        reg1_o = `ZeroWord;
+        r1_stall = 1'b1;
     end else if ((reg1_read_o == 1'b1) && (ex_wreg_i == 1'b1) && (ex_wd_i == reg1_addr_o)) begin
         reg1_o = ex_wdata_i;
+        r1_stall = 1'b0;
     end else if ((reg1_read_o == 1'b1) && (mem_wreg_i == 1'b1) && (mem_wd_i == reg1_addr_o)) begin
         reg1_o = mem_wdata_i;
+        r1_stall = 1'b0;
     end else if (reg1_read_o == 1'b1)  begin
         reg1_o = reg1_data_i;
+        r1_stall = 1'b0;
     end else if (reg1_read_o == 1'b0) begin
         reg1_o = imm;
+        r1_stall = 1'b0;
     end else begin
         reg1_o = `ZeroWord;
+        r1_stall = 1'b0;
     end
 end
 
 always @ ( * ) begin
     if(rst == `RstEnable) begin
         reg2_o = `ZeroWord;
+        r2_stall = 1'b0;
+    end else if ((reg2_read_o == 1'b1) && (ex_ld_flag == 1'b1) && (ex_wd_i == reg2_addr_o)) begin
+        reg2_o = ex_wdata_i;
+        r2_stall = 1'b1;
     end else if ((reg2_read_o == 1'b1) && (ex_wreg_i == 1'b1) && (ex_wd_i == reg2_addr_o)) begin
         reg2_o = ex_wdata_i;
+        r2_stall = 1'b0;
     end else if ((reg2_read_o == 1'b1) && (mem_wreg_i == 1'b1) && (mem_wd_i == reg2_addr_o)) begin
         reg2_o = mem_wdata_i;
+        r2_stall = 1'b0;
     end else if (reg2_read_o == 1'b1)  begin
         reg2_o = reg2_data_i;
+        r2_stall = 1'b0;
     end else if (reg2_read_o == 1'b0) begin
         reg2_o = imm;
+        r2_stall = 1'b0;
     end else begin
         reg2_o = `ZeroWord;
+        r2_stall = 1'b0;
     end
+end
+
+always @ ( * ) begin
+    stall_req_o = r1_stall | r2_stall;
 end
 
 always @ ( * ) begin

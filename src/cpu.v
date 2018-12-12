@@ -70,9 +70,9 @@ wire[`RegAddrBus] reg1_addr;
 wire[`RegAddrBus] reg2_addr;
 
 wire id_b_flag;
-wire id_b_target;
+wire[`InstAddrBus] id_b_target;
 wire ex_b_flag;
-wire ex_b_target;
+wire[`InstAddrBus] ex_b_target;
 wire[`StallBus] stall;
 
 wire[`InstAddrBus] id_pc_o;
@@ -89,17 +89,20 @@ wire ram_busy;
 wire ram_done;
 wire pc_done;
 wire[`RegBus] ram_r_data;
-wire[`RegAddrBus] ram_data;
+wire[`MemBus] ram_data;
 wire[`RegBus]   ram_addr;
 
-wire id_offset;
-wire ex_offset;
+wire[`InstAddrBus] id_offset;
+wire[`InstAddrBus] ex_offset;
 wire[`InstAddrBus] ex_pc_i;
 wire[`RegBus] mem_addr;
 wire[`AluOpBus] ex_aluop_o;
 wire[`AluOpBus] me_aluop_i;
 wire[`RegBus] me_mem_addr;
 wire[`InstBus] if_inst;
+
+wire[`InstAddrBus] mectrl_pc;
+wire[`InstAddrBus] if_pc;
 
 stall_ctrl stall_ctrl0(
     .rst(rst_in),
@@ -127,6 +130,7 @@ mem_ctrl mem_ctrl0(
     .ram_w_enable_i(ram_w_enable),
     .ram_mask_i(ram_mask),
     .pc(pc),
+    .rdy_in(rdy_in),
     .din(mem_din),
     .stall(stall),
     .cpu_wr(mem_wr),
@@ -136,14 +140,15 @@ mem_ctrl mem_ctrl0(
     .ram_addr_o(mem_a),
     .ram_r_data_o(ram_r_data),
     .cpu_data_o(mem_dout),
+    .pc_num(mectrl_pc),
     .inst_o(rom_data_i)
 );
 
 IF if0(
-    .pc(pc),
+    .pc(mectrl_pc),
     .inst(rom_data_i),
     .pc_done(pc_done),
-    //.pc_o(),
+    .pc_o(if_pc),
     .inst_o(if_inst),
     .stall_req_o(if_stall_req)
 );
@@ -152,7 +157,7 @@ IF if0(
 if_id if_id0(
     .clk(clk_in),
     .rst(rst_in),
-    .if_pc(pc),
+    .if_pc(if_pc),
     .if_inst(if_inst),
     .id_pc(id_pc_i),
     .id_inst(id_inst_i),

@@ -16,7 +16,7 @@ module id (
     input wire[`RegBus]         mem_wdata_i,
     input wire[`RegAddrBus]     mem_wd_i,
 
-    output reg                  pc_o,
+    output reg[`InstAddrBus]    pc_o,
 
     output reg                  reg1_read_o,
     output reg                  reg2_read_o,
@@ -208,7 +208,7 @@ always @ ( * ) begin
                 wd_o =         rd;
                 wreg_o =       `WriteEnable;
                 instvalid =    `Instvalid;
-                reg1_read_o =  1'b0;
+                reg1_read_o =  1'b1;
                 reg2_read_o =  1'b0;
                 reg1_addr_o =  rs1;
                 reg2_addr_o =  rs2;

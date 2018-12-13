@@ -151,19 +151,19 @@ always @ ( * ) begin
                 `EX_SB_OP: begin
                     ram_w_enable_o = `WriteEnable;
                     ram_addr_o = ram_addr_i;
-                    ram_w_data_o = {4{ram_r_data_i[7:0]}};
+                    ram_w_data_o = {4{wdata_i[7:0]}};
                     ram_mask_o = 2'b01;
                 end
                 `EX_SH_OP: begin
                     ram_w_enable_o = `WriteEnable;
                     ram_addr_o = ram_addr_i;
-                    ram_w_data_o = {2{ram_r_data_i[15:0]}};
+                    ram_w_data_o = {2{wdata_i[15:0]}};
                     ram_mask_o = 2'b10;
                 end
                 `EX_SW_OP: begin
                     ram_w_enable_o = `WriteEnable;
                     ram_addr_o = ram_addr_i;
-                    ram_w_data_o = ram_r_data_i;
+                    ram_w_data_o = wdata_i;
                     ram_mask_o = 2'b11;
                 end
             endcase

@@ -108,7 +108,7 @@ always @ ( * ) begin
                         reg2_addr_o =  rs2;
                         imm =          {{20{S_imm[11]}},S_imm[11:0]};
                     end
-                    `Funct3SB: begin
+                    `Funct3SW: begin
                         aluop_o =      `EX_SW_OP;
                         alusel_o =     `EX_RES_LD_ST;
                         wd_o =         rd;
@@ -119,6 +119,8 @@ always @ ( * ) begin
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
                         imm =          {{20{S_imm[11]}},S_imm[11:0]};
+                    end
+                    default: begin
                     end
                 endcase
             end

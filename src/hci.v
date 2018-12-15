@@ -207,6 +207,8 @@ always @*
       end
   end
 
+reg time_prt = 1'b0;
+
 always @*
   begin
     // Setup default FF updates.
@@ -237,6 +239,7 @@ always @*
               d_tx_data = io_din;
               d_wr_en   = 1'b1;
             end
+            time_prt = time_prt ^ 1;
             $write("%c", io_din);
           end
           3'h04: begin      // 0x30004 write: indicates program stop
@@ -248,7 +251,7 @@ always @*
             $finish;
           end
         endcase
-      end else begin
+      end/* else begin
         case (io_sel)
           3'h00: begin      // 0x30000 read: read byte from input buffer
             if (!io_in_empty) begin
@@ -556,9 +559,9 @@ always @*
             end
         end
 
-    endcase
+    endcase*/
     end
-    
+
   end
 
 assign active      = (q_state != S_DISABLED);

@@ -126,6 +126,10 @@ always @ ( * ) begin
         `EX_SH_OP, `EX_SB_OP, `EX_SW_OP: begin
         //if(alusel_i == EX_RES_LD_ST) begin
             mem_addr_o = reg1_i + offset_i;
+            is_ld = 1'b0;
+        end
+        `EX_LW_OP, `EX_LH_OP, `EX_LB_OP, `EX_LHU_OP, `EX_LBU_OP: begin
+            mem_addr_o = reg1_i + offset_i;
             is_ld = 1'b1;
         end
         default: begin

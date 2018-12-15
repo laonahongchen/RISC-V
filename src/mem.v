@@ -57,9 +57,9 @@ always @ ( * ) begin
         //    end
         //endcase
     end else begin
-        wd_o = `NOPRegAddr;
-        wreg_o = `WriteDisable;
-        wdata_o = `ZeroWord;
+        wd_o = wd_i;
+        wreg_o = wreg_i;
+        wdata_o = wdata_i;
         ram_r_enable_o = 1'b0;
         stall_req_o = `NoStop;
         ram_w_data_o = `ZeroWord;
@@ -70,7 +70,7 @@ always @ ( * ) begin
             stall_req_o = 1'b0;
             case(aluop_i)
                 `EX_LB_OP: begin
-                    case (ram_addr_i)
+                    case (ram_addr_i[1:0])
                         2'b11: begin
                             wdata_o = {{24{ram_r_data_i[31]}},ram_r_data_i[31:24]};
                         end
@@ -89,7 +89,7 @@ always @ ( * ) begin
                     endcase
                 end
                 `EX_LH_OP: begin
-                    case (ram_addr_i)
+                    case (ram_addr_i[1:0])
                         2'b10: begin
                             wdata_o = {{12{ram_r_data_i[31]}},ram_r_data_i[31:16]};
                         end
@@ -105,7 +105,7 @@ always @ ( * ) begin
                     wdata_o = ram_r_data_i;
                 end
                 `EX_LBU_OP: begin
-                    case (ram_addr_i)
+                    case (ram_addr_i[1:0])
                         2'b11: begin
                             wdata_o = {{24{1'b0}},ram_r_data_i[31:24]};
                         end
@@ -124,7 +124,7 @@ always @ ( * ) begin
                     endcase
                 end
                 `EX_LHU_OP: begin
-                    case (ram_addr_i)
+                    case (ram_addr_i[1:0])
                         2'b10: begin
                             wdata_o = {{12{1'b0}},ram_r_data_i[31:16]};
                         end

@@ -306,6 +306,18 @@ always @ ( * ) begin
                 reg2_addr_o =  rs2;
                 imm =          {U_imm,12'h0};
             end
+            `OPAUIPC: begin
+                aluop_o =      `EX_AUIPC_OP;
+                alusel_o =     `EX_RES_ARITH;
+                wd_o =         rd;
+                wreg_o =       `WriteEnable;
+                instvalid =    `Instvalid;
+                reg1_read_o =  1'b0;
+                reg2_read_o =  1'b0;
+                reg1_addr_o =  rs1;
+                reg2_addr_o =  rs2;
+                imm =          {U_imm,12'h0};
+            end
             `OpOP: begin
                 case(funct3)
                     `Funct3ADD: begin

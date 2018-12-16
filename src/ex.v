@@ -56,7 +56,7 @@ always @ ( * ) begin
                 b_target_o = pc_i + offset_i;
             end
             `EX_BGE_OP: begin
-                b_flag_o = ($signed(reg1_i) > $signed(reg2_i));
+                b_flag_o = ($signed(reg1_i) >= $signed(reg2_i));
                 b_target_o = pc_i + offset_i;
             end
             `EX_BLTU_OP: begin
@@ -64,7 +64,7 @@ always @ ( * ) begin
                 b_target_o = pc_i + offset_i;
             end
             `EX_BGEU_OP: begin
-                b_flag_o = ((reg1_i) > (reg2_i));
+                b_flag_o = ((reg1_i) >= (reg2_i));
                 b_target_o = pc_i + offset_i;
             end
             default: begin
@@ -157,6 +157,9 @@ always @ ( * ) begin
             end
             `EX_SLTU_OP : begin
                 arithout = reg1_i < reg2_i;
+            end
+            `EX_AUIPC_OP: begin
+                arithout = pc_i + offset_i;
             end
             default: begin
                 arithout = `ZeroWord;

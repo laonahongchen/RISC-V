@@ -15,6 +15,7 @@ always @ ( * ) begin
         inst_o = `ZeroWord;
         stall_req_o = 1'b0;
         pc_o = `ZeroWord;
+        //inst_o = `ZeroWord;
     end else if(pc_done) begin
         stall_req_o = 1'b0;
         inst_o = inst;
@@ -22,7 +23,7 @@ always @ ( * ) begin
     end else begin
         stall_req_o = 1'b1;
         inst_o = `ZeroWord;
-    //    pc_o = `ZeroWord;
+        pc_o = `ZeroWord;
     end
 end
 

@@ -70,23 +70,27 @@ always @ ( * ) begin
             stall_req_o = 1'b0;
             case(aluop_i)
                 `EX_LB_OP: begin
-                    case (ram_addr_i[1:0])
-                        2'b11: begin
-                            wdata_o = {{24{ram_r_data_i[31]}},ram_r_data_i[31:24]};
-                        end
-                        2'b10: begin
-                            wdata_o = {{24{ram_r_data_i[23]}},ram_r_data_i[23:16]};
-                        end
-                        2'b01: begin
-                            wdata_o = {{24{ram_r_data_i[15]}},ram_r_data_i[15:8]};
-                        end
-                        2'b00: begin
-                            wdata_o = {{24{ram_r_data_i[7]}},ram_r_data_i[7:0]};
-                        end
-                        default: begin
-                            wdata_o = `ZeroWord;
-                        end
-                    endcase
+                    if(ram_addr_i[17:16] == 2'b11) begin
+                        wdata_o = {{24{ram_r_data_i[7]}},ram_r_data_i[31:24]};
+                    end else  begin
+                        case (ram_addr_i[1:0])
+                            2'b11: begin
+                                wdata_o = {{24{ram_r_data_i[31]}},ram_r_data_i[31:24]};
+                            end
+                            2'b10: begin
+                                wdata_o = {{24{ram_r_data_i[23]}},ram_r_data_i[23:16]};
+                            end
+                            2'b01: begin
+                                wdata_o = {{24{ram_r_data_i[15]}},ram_r_data_i[15:8]};
+                            end
+                            2'b00: begin
+                                wdata_o = {{24{ram_r_data_i[7]}},ram_r_data_i[7:0]};
+                            end
+                            default: begin
+                                wdata_o = `ZeroWord;
+                            end
+                        endcase
+                    end
                 end
                 `EX_LH_OP: begin
                     case (ram_addr_i[1:0])
@@ -105,23 +109,27 @@ always @ ( * ) begin
                     wdata_o = ram_r_data_i;
                 end
                 `EX_LBU_OP: begin
-                    case (ram_addr_i[1:0])
-                        2'b11: begin
-                            wdata_o = {{24{1'b0}},ram_r_data_i[31:24]};
-                        end
-                        2'b10: begin
-                            wdata_o = {{24{1'b0}},ram_r_data_i[23:16]};
-                        end
-                        2'b01: begin
-                            wdata_o = {{24{1'b0}},ram_r_data_i[15:8]};
-                        end
-                        2'b00: begin
-                            wdata_o = {{24{1'b0}},ram_r_data_i[7:0]};
-                        end
-                        default: begin
-                            wdata_o = `ZeroWord;
-                        end
-                    endcase
+                    if(ram_addr_i[17:16] == 2'b11) begin
+                        wdata_o = {{24{1'b0}},ram_r_data_i[31:24]};
+                    end else begin
+                        case (ram_addr_i[1:0])
+                            2'b11: begin
+                                wdata_o = {{24{1'b0}},ram_r_data_i[31:24]};
+                            end
+                            2'b10: begin
+                                wdata_o = {{24{1'b0}},ram_r_data_i[23:16]};
+                            end
+                            2'b01: begin
+                                wdata_o = {{24{1'b0}},ram_r_data_i[15:8]};
+                            end
+                            2'b00: begin
+                                wdata_o = {{24{1'b0}},ram_r_data_i[7:0]};
+                            end
+                            default: begin
+                                wdata_o = `ZeroWord;
+                            end
+                        endcase
+                    end
                 end
                 `EX_LHU_OP: begin
                     case (ram_addr_i[1:0])

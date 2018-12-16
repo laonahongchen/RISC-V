@@ -228,7 +228,7 @@ always @ ( * ) begin
                         reg2_read_o =  1'b1;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          {{20{SB_imm[11]}},SB_imm};
+                        imm =          {{19{SB_imm[11]}},SB_imm, 1'b0};
                     end
                     `Funct3BNE: begin
                         aluop_o =      `EX_BNE_OP;
@@ -240,7 +240,7 @@ always @ ( * ) begin
                         reg2_read_o =  1'b1;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          {{20{SB_imm[11]}},SB_imm};
+                        imm =          {{19{SB_imm[11]}},SB_imm, 1'b0};
                     end
                     `Funct3BLT: begin
                         aluop_o =      `EX_BLT_OP;
@@ -252,7 +252,7 @@ always @ ( * ) begin
                         reg2_read_o =  1'b1;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          {{20{SB_imm[11]}},SB_imm};
+                        imm =          {{19{SB_imm[11]}},SB_imm, 1'b0};
                     end
                     `Funct3BGE: begin
                         aluop_o =      `EX_BGE_OP;
@@ -264,7 +264,7 @@ always @ ( * ) begin
                         reg2_read_o =  1'b1;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          {{20{SB_imm[11]}},SB_imm};
+                        imm =          {{19{SB_imm[11]}},SB_imm, 1'b0};
                     end
                     `Funct3BLTU: begin
                         aluop_o =      `EX_BLTU_OP;
@@ -276,7 +276,7 @@ always @ ( * ) begin
                         reg2_read_o =  1'b1;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          {{20{SB_imm[11]}},SB_imm};
+                        imm =          {{19{SB_imm[11]}},SB_imm, 1'b0};
                     end
                     `Funct3BGEU: begin
                         aluop_o =      `EX_BGEU_OP;
@@ -288,7 +288,7 @@ always @ ( * ) begin
                         reg2_read_o =  1'b1;
                         reg1_addr_o =  rs1;
                         reg2_addr_o =  rs2;
-                        imm =          {{20{SB_imm[11]}},SB_imm};
+                        imm =          {{19{SB_imm[11]}},SB_imm, 1'b0};
                     end
                     default: begin
                     end

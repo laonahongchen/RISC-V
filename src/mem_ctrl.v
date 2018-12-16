@@ -61,6 +61,8 @@ always @ ( * ) begin
     //    read_enable = 1'b0;
     end else if(cur_mask == 2'b00) begin
             cur_mask = ram_mask_i;
+    //end else begin
+        //cur_mask =
     end
 end
 
@@ -196,10 +198,17 @@ always @ ( posedge clk ) begin
             4'h1: begin
                 //ram_busy <= 1'b1;
                 //data_o[7:0] <= din;
-                cur_done <= 1'b0;
-                ram_done <= 1'b0;
-                ram_addr_o <= addr_i + 1;
-                read_sta <= read_sta + 1;
+                //cur_done <= 1'b0;
+                //ram_done <= 1'b0;
+                if(addr_i[17:16] == 2'b11) begin
+                    cur_done <= 1'b1;
+                    ram_addr_o <= pc;
+                    read_sta <= 4'h5;
+                end else begin
+                    //ram_done <= 1'
+                    ram_addr_o <= addr_i + 1;
+                    read_sta <= read_sta + 1;
+                end
             end
             4'h2: begin
                 //ram_busy = 1'b1;
@@ -246,17 +255,33 @@ always @ ( * ) begin
         case(read_sta)
             4'h2: begin
                 data_o[7:0] = din;
+    /*            data_o[15:8] = data_o[15:8];
+                data_o[23:16] = data_o[23:16];
+                data_o[31:24] = data_o[31:24];*/
             end
             4'h3: begin
+                //data_o[7:0] = data_o[7:0];
                 data_o[15:8] = din;
+                //data_o[23:16] = data_o[23:16];
+                //data_o[31:24] = data_o[31:24];
             end
             4'h4: begin
+            //    data_o[7:0] = data_o[7:0];
+            //    data_o[15:8] = data_o[15:8];
                 data_o[23:16] = din;
+            //    data_o[31:24] = data_o[31:24];
             end
             4'h5: begin
+            //    data_o[7:0] = data_o[7:0];
+            //    data_o[15:8] = data_o[15:8];
+            //    data_o[23:16] = data_o[23:16];
                 data_o[31:24] = din;
             end
             default: begin
+            //    data_o[7:0] = data_o[7:0];
+            //    data_o[15:8] = data_o[15:8];
+            //    data_o[23:16] = data_o[23:16];
+            //    data_o[31:24] = data_o[31:24];
             end
         endcase
     end
@@ -268,13 +293,18 @@ always @ ( * ) begin
             ram_done = 1'b0;
             pc_done = 1'b1;
             inst_o = data_o;
+            ram_r_data_o = `ZeroWord;
         end else begin
             ram_done = 1'b1;
+            pc_done = 1'b0;
+            inst_o = `ZeroWord;
             ram_r_data_o = data_o;
         end
     end else begin
         inst_o = `ZeroWord;
         pc_done = 1'b0;
+        ram_done = 1'b0;
+        ram_r_data_o = `ZeroWord;
     end
 end
 

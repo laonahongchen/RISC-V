@@ -27,10 +27,13 @@ always @ ( posedge clk ) begin
     end
 end
 
+integer i;
+
 always @ ( * ) begin
     if (rst == `RstEnable ) begin
         rdata1 = `ZeroWord;
-        regs[0] = `ZeroWord;
+        for(i = 0; i < 32; i = i + 1)
+            regs[i] = `ZeroWord;
     //end else if (raddr1 == `RegNumLog2'h0) begin
         //regs[raddr1] = `ZeroWord;
     end else if ((raddr1 == waddr) && (we == `WriteEnable) && (re1 == `ReadEnable)) begin

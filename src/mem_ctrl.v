@@ -30,7 +30,10 @@ reg mpc;
 reg cur_done;
 reg[`InstAddrBus] addr_i;
 reg[`RegBus] data_o;
+reg[`RegBus] form_data;
 reg[1:0] cur_mask;
+reg inreg;
+reg fmask;
 /*
 always @ ( * ) begin
     if(rst == `RstEnable) begin
@@ -53,20 +56,26 @@ always @ ( * ) begin
     end
 end*/
 
-
+/*
 always @ ( * ) begin
     if(rst == `RstEnable) begin
         cur_mask = 2'b00;
-        mpc = 1'b0;
+        //mpc = 1'b0;
     //    read_enable = 1'b0;
     end else if(cur_mask == 2'b00) begin
             cur_mask = ram_mask_i;
     //end else begin
         //cur_mask =
+    end else begin
+        cur_mask = fmask;
+        //mpc = fmpc;
     end
 end
+*/
 
 always @ ( posedge clk ) begin
+
+    //fmask <= cur_mask;
     //cur_done <= 1'b0;
     //ram_done <= 1'b0;
     if(rst == `RstEnable) begin
@@ -75,29 +84,24 @@ always @ ( posedge clk ) begin
         cpu_wr <= 1'b0;
         cur_done <= 1'b0;
         ram_done <= 1'b0;
+        mpc = 1'b0;
+        form_data <= data_o;
     //    cur_mask <= 2'b00;
     end else if (!rdy_in) begin
         ram_busy <= 1'b1;
         cpu_wr <= 1'b0;
         cur_done <= 1'b0;
         ram_done <= 1'b0;
+        form_data <= data_o;
     //end
 
-    end else if ((cpu_wr == 1'b1 && read_sta != 4'h0 && read_sta != 4'h5) || ram_w_enable_i == `WriteEnable) begin
+    end else if ((cpu_wr == 1'b1 && read_sta != 4'h0 && read_sta != 4'h5)) begin
         cpu_wr <= 1'b1;
+        form_data <= data_o;
     //    if(cur_mask == 2'b00)
     //        cur_mask <= ram_mask_i;
         //$display("write start");
         case(cur_mask)
-            2'b01: begin
-                ram_done <= 1'b1;
-                cur_done <= 1'b0;
-                ram_busy <= 1'b0;
-                ram_addr_o <= ram_addr_i;
-                //$display(ram_addr_o);
-                cpu_data_o <= ram_data_i[7:0];
-                cur_mask <= 2'b00;
-            end
             2'b10: begin
                 case (read_sta)
                     4'h0,4'h5: begin
@@ -111,7 +115,7 @@ always @ ( posedge clk ) begin
                         read_sta <= 4'h1;
                     end
                     4'h1: begin
-                        ram_busy <= 1'b1;
+                        ram_busy <= 1'b0;
                         cur_done <= 1'b0;
                         ram_done <= 1'b1;
                         ram_addr_o <= addr_i + 1;
@@ -174,8 +178,50 @@ always @ ( posedge clk ) begin
             end
         endcase
     //end else if(ram_r_enable_i == `WriteEnable) begin
+    end else if(ram_w_enable_i == `WriteEnable) begin
+        cpu_wr <= 1'b1;
+        form_data <= ram_data_i;
+        case (ram_mask_i)
+            2'b01: begin
+                inreg <= 1'b1;
+                cur_done <= 1'b1;
+                mpc <= 1'b1;
+                ram_done <= 1'b0;
+                //cur_done <= 1'b0;
+                ram_busy <= 1'b0;
+                ram_addr_o <= ram_addr_i;
+                //$display(ram_addr_o);
+                cpu_data_o <= ram_data_i[7:0];
+                cur_mask <= 2'b00;
+            end
+            2'b10: begin
+                ram_busy <= 1'b1;
+                cur_done <= 1'b0;
+                ram_done <= 1'b0;
+                data_o <= ram_data_i;
+                addr_i <= ram_addr_i;
+                ram_addr_o <= ram_addr_i;
+                cpu_data_o <= ram_data_i[7:0];
+                read_sta <= 4'h1;
+                cur_mask <= ram_mask_i;
+            end
+            2'b11: begin
+                ram_busy <= 1'b1;
+                ram_done <= 1'b0;
+                cur_done <= 1'b0;
+                data_o <= ram_data_i;
+                addr_i <= ram_addr_i;
+                ram_addr_o <= ram_addr_i;
+                cpu_data_o <= ram_data_i[7:0];
+                read_sta <= 4'h1;
+                cur_mask <= ram_mask_i;
+            end
+            default: begin
+            end
+        endcase
     end else begin
         cpu_wr <= 1'b0;
+        form_data <= data_o;
         case(read_sta)
             4'h0,4'h5: begin
                 cur_done <= 1'b0;
@@ -255,6 +301,7 @@ always @ ( * ) begin
         case(read_sta)
             4'h2: begin
                 data_o[7:0] = din;
+                data_o[31:8] = form_data[31:8];
     /*            data_o[15:8] = data_o[15:8];
                 data_o[23:16] = data_o[23:16];
                 data_o[31:24] = data_o[31:24];*/
@@ -262,6 +309,8 @@ always @ ( * ) begin
             4'h3: begin
                 //data_o[7:0] = data_o[7:0];
                 data_o[15:8] = din;
+                data_o[7:0] = form_data[7:0];
+                data_o[31:16] = form_data[31:16];
                 //data_o[23:16] = data_o[23:16];
                 //data_o[31:24] = data_o[31:24];
             end
@@ -269,21 +318,31 @@ always @ ( * ) begin
             //    data_o[7:0] = data_o[7:0];
             //    data_o[15:8] = data_o[15:8];
                 data_o[23:16] = din;
+                data_o[15:0] = form_data[15:0];
+                data_o[31:24] = form_data[31:24];
             //    data_o[31:24] = data_o[31:24];
             end
             4'h5: begin
             //    data_o[7:0] = data_o[7:0];
             //    data_o[15:8] = data_o[15:8];
             //    data_o[23:16] = data_o[23:16];
+                data_o[23:0] = form_data[23:0];
                 data_o[31:24] = din;
             end
             default: begin
+                data_o = form_data;
             //    data_o[7:0] = data_o[7:0];
             //    data_o[15:8] = data_o[15:8];
             //    data_o[23:16] = data_o[23:16];
             //    data_o[31:24] = data_o[31:24];
             end
         endcase
+    end else begin
+        //if(read_sta != 4'h1) begin
+            data_o = form_data;
+        //end else begin
+        //    data_o = ram_data_i;
+        //end
     end
 end
 

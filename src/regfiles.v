@@ -24,6 +24,8 @@ always @ ( posedge clk ) begin
         if((we == `WriteEnable) && (waddr != `RegNumLog2'h0)) begin
             regs[waddr] <= wdata;
         end
+    end else begin
+        regs[0] = 1'b0;
     end
 end
 
@@ -32,8 +34,8 @@ integer i;
 always @ ( * ) begin
     if (rst == `RstEnable ) begin
         rdata1 = `ZeroWord;
-        for(i = 0; i < 32; i = i + 1)
-            regs[i] = `ZeroWord;
+    //    for(i = 0; i < 32; i = i + 1)
+    //        regs[i] = `ZeroWord;
     //end else if (raddr1 == `RegNumLog2'h0) begin
         //regs[raddr1] = `ZeroWord;
     end else if ((raddr1 == waddr) && (we == `WriteEnable) && (re1 == `ReadEnable)) begin

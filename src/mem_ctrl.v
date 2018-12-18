@@ -116,7 +116,8 @@ always @ ( posedge clk ) begin
                     end
                     4'h1: begin
                         ram_busy <= 1'b0;
-                        cur_done <= 1'b0;
+                        cur_done <= 1'b1;
+                        mpc <= 1'b1;
                 //        ram_done <= 1'b1;
                         ram_addr_o <= addr_i + 1;
                         cpu_data_o <= data_o[15:8];

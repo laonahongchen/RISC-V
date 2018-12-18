@@ -16,15 +16,15 @@ module pc_reg(
 reg[`InstAddrBus] next_pc;
 reg next_jump;
 reg[`InstAddrBus] target_addr;
-reg ce;
-
+//reg ce;
+/*
 always @ ( posedge clk ) begin
     if (rst == `RstEnable) begin
         ce <= `ChipsDisable;
     end else begin
         ce <= `ChipsEnable;
     end
-end
+end*/
 
 always @ ( * ) begin
     if(rst == `RstEnable) begin
@@ -47,7 +47,7 @@ always @ ( * ) begin
 end
 
 always @ ( negedge clk ) begin
-    if (ce == `ChipsDisable)  begin
+    if (rst == `RstEnable)  begin
         pc <= `ZeroWord;
         next_jump <= 1'b0;
     end else if (id_b_flag_i) begin

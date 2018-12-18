@@ -160,7 +160,7 @@ always @ ( posedge clk ) begin
                     end
                     4'h3: begin
                         cur_done <= 1'b1;
-                        mpc = 1'b1;
+                        mpc <= 1'b1;
                 //        ram_done <= 1'b1;
                         ram_busy <= 1'b0;
                         ram_addr_o <= addr_i + 3;
@@ -234,10 +234,10 @@ always @ ( posedge clk ) begin
                     ram_addr_o <= ram_addr_i;
                     pc_num <= `ZeroWord;
                 end else begin
-                    mpc = 1'b0;
-                    addr_i = pc;
-                    pc_num = pc;
-                    ram_addr_o = pc;
+                    mpc <= 1'b0;
+                    addr_i <= pc;
+                    pc_num <= pc;
+                    ram_addr_o <= pc;
                 end
 
                 read_sta <= 4'h1;
@@ -247,7 +247,7 @@ always @ ( posedge clk ) begin
                 //data_o[7:0] <= din;
                 //cur_done <= 1'b0;
                 //ram_done <= 1'b0;
-                if(addr_i[17:16] == 2'b11) begin
+                if(addr_i == 32'h30000) begin
                     cur_done <= 1'b1;
                     ram_addr_o <= pc;
                     read_sta <= 4'h5;

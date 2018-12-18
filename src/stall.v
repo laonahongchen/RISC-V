@@ -16,8 +16,6 @@ always @ ( * ) begin
         stall = `NoStall;
     end else if(rdy_in == 1'b0) begin
         stall = `AllStall;
-    //end else if(wb_stall_req == `StallReq) begin
-    //    stall = `WbStall;
     end else if(me_stall_req == `StallReq) begin
         stall = `MemStall;
     end else if(ex_stall_req == `StallReq) begin

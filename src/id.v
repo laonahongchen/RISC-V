@@ -67,6 +67,8 @@ always @ ( * ) begin
         reg1_addr_o =  `NOPRegAddr;
         reg2_addr_o =  `NOPRegAddr;
         imm =          `ZeroWord;
+        b_flag_o =     1'b0;
+        b_target_o =   `ZeroWord;
     end else begin
         aluop_o =      `EX_NOP_OP;
         alusel_o =     `EX_RES_NOP;
@@ -75,8 +77,7 @@ always @ ( * ) begin
         instvalid =    `InstInvalid;
         reg1_read_o =  1'b0;
         reg2_read_o =  1'b0;
-        reg1_addr_o =  rs1;
-        reg2_addr_o =  rs2;
+        reg1_addr_o =  `NOPRegAddr;
         reg2_addr_o =  `NOPRegAddr;
         imm =          `ZeroWord;
         b_flag_o =     1'b0;

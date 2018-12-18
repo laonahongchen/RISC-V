@@ -104,6 +104,8 @@ wire[`InstBus] if_inst;
 wire[`InstAddrBus] mectrl_pc;
 wire[`InstAddrBus] if_pc;
 
+assign dbgreg_dout = pc;
+
 stall_ctrl stall_ctrl0(
     .rst(rst_in),
     .rdy_in(rdy_in),

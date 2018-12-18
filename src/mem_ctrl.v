@@ -83,7 +83,7 @@ always @ ( posedge clk ) begin
         ram_busy <= 1'b1;
         cpu_wr <= 1'b0;
         cur_done <= 1'b0;
-        ram_done <= 1'b0;
+    //    ram_done <= 1'b0;
         mpc = 1'b0;
         form_data <= data_o;
     //    cur_mask <= 2'b00;
@@ -91,7 +91,7 @@ always @ ( posedge clk ) begin
         ram_busy <= 1'b1;
         cpu_wr <= 1'b0;
         cur_done <= 1'b0;
-        ram_done <= 1'b0;
+    //    ram_done <= 1'b0;
         form_data <= data_o;
     //end
 
@@ -107,7 +107,7 @@ always @ ( posedge clk ) begin
                     4'h0,4'h5: begin
                         ram_busy <= 1'b1;
                         cur_done <= 1'b0;
-                        ram_done <= 1'b0;
+                //        ram_done <= 1'b0;
                         data_o <= ram_data_i;
                         addr_i <= ram_addr_i;
                         ram_addr_o <= ram_addr_i;
@@ -117,7 +117,7 @@ always @ ( posedge clk ) begin
                     4'h1: begin
                         ram_busy <= 1'b0;
                         cur_done <= 1'b0;
-                        ram_done <= 1'b1;
+                //        ram_done <= 1'b1;
                         ram_addr_o <= addr_i + 1;
                         cpu_data_o <= data_o[15:8];
                         read_sta <= 4'h0;
@@ -134,7 +134,7 @@ always @ ( posedge clk ) begin
                 case (read_sta)
                     4'h0,4'h5: begin
                         ram_busy <= 1'b1;
-                        ram_done <= 1'b0;
+                //        ram_done <= 1'b0;
                         cur_done <= 1'b0;
                         data_o <= ram_data_i;
                         addr_i <= ram_addr_i;
@@ -144,7 +144,7 @@ always @ ( posedge clk ) begin
                     end
                     4'h1: begin
                         cur_done <= 1'b0;
-                        ram_done <= 1'b0;
+                //        ram_done <= 1'b0;
                         ram_busy <= 1'b1;
                         ram_addr_o <= addr_i + 1;
                         cpu_data_o <= data_o[15:8];
@@ -152,15 +152,16 @@ always @ ( posedge clk ) begin
                     end
                     4'h2: begin
                         cur_done <= 1'b0;
-                        ram_done <= 1'b0;
+                //        ram_done <= 1'b0;
                         ram_busy <= 1'b1;
                         ram_addr_o <= addr_i + 2;
                         cpu_data_o <= data_o[23:16];
                         read_sta <= read_sta + 1;
                     end
                     4'h3: begin
-                        cur_done <= 1'b0;
-                        ram_done <= 1'b1;
+                        cur_done <= 1'b1;
+                        mpc = 1'b1;
+                //        ram_done <= 1'b1;
                         ram_busy <= 1'b0;
                         ram_addr_o <= addr_i + 3;
                         cpu_data_o <= data_o[31:24];
@@ -186,7 +187,7 @@ always @ ( posedge clk ) begin
                 inreg <= 1'b1;
                 cur_done <= 1'b1;
                 mpc <= 1'b1;
-                ram_done <= 1'b0;
+            //    ram_done <= 1'b0;
                 //cur_done <= 1'b0;
                 ram_busy <= 1'b0;
                 ram_addr_o <= ram_addr_i;
@@ -197,8 +198,8 @@ always @ ( posedge clk ) begin
             2'b10: begin
                 ram_busy <= 1'b1;
                 cur_done <= 1'b0;
-                ram_done <= 1'b0;
-                data_o <= ram_data_i;
+            //    ram_done <= 1'b0;
+            //    data_o <= ram_data_i;
                 addr_i <= ram_addr_i;
                 ram_addr_o <= ram_addr_i;
                 cpu_data_o <= ram_data_i[7:0];
@@ -207,9 +208,9 @@ always @ ( posedge clk ) begin
             end
             2'b11: begin
                 ram_busy <= 1'b1;
-                ram_done <= 1'b0;
+            //    ram_done <= 1'b0;
                 cur_done <= 1'b0;
-                data_o <= ram_data_i;
+            //    data_o <= ram_data_i;
                 addr_i <= ram_addr_i;
                 ram_addr_o <= ram_addr_i;
                 cpu_data_o <= ram_data_i[7:0];
@@ -225,7 +226,7 @@ always @ ( posedge clk ) begin
         case(read_sta)
             4'h0,4'h5: begin
                 cur_done <= 1'b0;
-                ram_done <= 1'b0;
+            //    ram_done <= 1'b0;
                 ram_busy <= 1'b1;
                 if(ram_r_enable_i == `WriteEnable) begin
                     mpc <= 1'b1;
@@ -266,7 +267,7 @@ always @ ( posedge clk ) begin
                 //ram_busy = 1'b1;
                 //data_o[23:16] <= din;
                 cur_done <= 1'b0;
-                ram_done <= 1'b0;
+            //    ram_done <= 1'b0;
                 ram_addr_o <= addr_i + 3;
                 read_sta <= read_sta + 1;
             end

@@ -251,7 +251,7 @@ always @*
             $finish;
           end
         endcase
-      end/* else begin
+      end else begin
         case (io_sel)
           3'h00: begin      // 0x30000 read: read byte from input buffer
             if (!io_in_empty) begin
@@ -559,7 +559,7 @@ always @*
             end
         end
 
-    endcase*/
+    endcase
     end
 
   end

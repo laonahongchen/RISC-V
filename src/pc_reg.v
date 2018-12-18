@@ -28,10 +28,10 @@ end
 
 always @ ( * ) begin
     if(rst == `RstEnable) begin
-        next_jump = 2'b00;
+    //    next_jump = 2'b00;
         next_pc = 4'h4;
-        pc = `ZeroWord;
-        target_addr = `ZeroWord;
+    //    pc = `ZeroWord;
+    //    target_addr = `ZeroWord;
     end
     else begin
         case(next_jump)
@@ -49,6 +49,7 @@ end
 always @ ( negedge clk ) begin
     if (ce == `ChipsDisable)  begin
         pc <= `ZeroWord;
+        next_jump <= 1'b0;
     end else if (id_b_flag_i) begin
         if(stall[0] == `NoStop) begin
             next_jump <= 1'b0;

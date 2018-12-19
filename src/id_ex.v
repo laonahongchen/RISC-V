@@ -27,6 +27,21 @@ module id_ex (
 
 reg next_jump;
 
+reg[32:0] cnt_num;
+/*
+always @ ( posedge clk ) begin
+    if(rst == `RstEnable) begin
+        cnt_num = 1'b0;
+    end else if(aluop_i != 6'h0) begin
+        cnt_num = cnt_num + 1;
+        if(cnt_num > 32'd200) begin
+            stall_req_o = 1'b1;
+            //cnt_num = 32'd999;
+        end
+    end
+end
+*/
+
 always @ ( posedge clk ) begin
     if(rst == `RstEnable) begin
         ex_aluop <= `EX_NOP_OP;
@@ -38,6 +53,7 @@ always @ ( posedge clk ) begin
         ex_pc <= `ZeroWord;
         ex_offset <= `ZeroWord;
         next_jump <= 1'b0;
+        cnt_num <= 6'h0;
     end else if (ex_b_flag_i) begin
         if(stall[2] == `Stop && stall[3] == `NoStop) begin
             ex_aluop <= `EX_NOP_OP;
@@ -100,6 +116,9 @@ always @ ( posedge clk ) begin
             ex_pc <= id_pc;
             ex_offset <= id_offset;
             next_jump <= 1'b0;
+            if(id_aluop != 6'h0) begin
+                cnt_num <= cnt_num + 1;
+            end
         end
     end
 end

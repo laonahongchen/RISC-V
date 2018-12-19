@@ -34,6 +34,12 @@ reg[`RegBus] form_data;
 reg[1:0] cur_mask;
 reg inreg;
 reg fmask;
+
+reg[`InstAddrBus] pcche[0:`CacheSize - 1];
+reg[`InstBus] instche[0:`CacheSize - 1];
+reg vldche[0:`CacheSize - 1];
+
+
 /*
 always @ ( * ) begin
     if(rst == `RstEnable) begin
@@ -72,6 +78,8 @@ always @ ( * ) begin
     end
 end
 */
+reg cashhit;
+integer i;
 
 always @ ( posedge clk ) begin
 
@@ -83,20 +91,25 @@ always @ ( posedge clk ) begin
         ram_busy <= 1'b1;
         cpu_wr <= 1'b0;
         cur_done <= 1'b0;
+        for(i = 0; i < `CacheSize; i = i + 1)
+            vldche[i] = 1'b0;
     //    ram_done <= 1'b0;
         mpc = 1'b0;
         form_data <= data_o;
+        cashhit <= 1'b0;
     //    cur_mask <= 2'b00;
     end else if (!rdy_in) begin
         ram_busy <= 1'b1;
         cpu_wr <= 1'b0;
         cur_done <= 1'b0;
+        cashhit <= 1'b0;
     //    ram_done <= 1'b0;
         form_data <= data_o;
     //end
 
     end else if ((cpu_wr == 1'b1 && read_sta != 4'h0 && read_sta != 4'h5)) begin
         cpu_wr <= 1'b1;
+        cashhit <= 1'b0;
         form_data <= data_o;
     //    if(cur_mask == 2'b00)
     //        cur_mask <= ram_mask_i;
@@ -181,6 +194,7 @@ always @ ( posedge clk ) begin
         endcase
     //end else if(ram_r_enable_i == `WriteEnable) begin
     end else if(ram_w_enable_i == `WriteEnable) begin
+        cashhit <= 1'b0;
         cpu_wr <= 1'b1;
         form_data <= ram_data_i;
         case (ram_mask_i)
@@ -223,31 +237,56 @@ always @ ( posedge clk ) begin
         endcase
     end else begin
         cpu_wr <= 1'b0;
-        form_data <= data_o;
+        //form_data <= data_o;
         case(read_sta)
             4'h0,4'h5: begin
-                cur_done <= 1'b0;
+            //    cur_done <= 1'b0;
             //    ram_done <= 1'b0;
-                ram_busy <= 1'b1;
+            //    ram_busy <= 1'b1;
                 if(ram_r_enable_i == `WriteEnable) begin
                     mpc <= 1'b1;
+                    cur_done <= 1'b0;
+                    ram_busy <= 1'b1;
                     addr_i <= ram_addr_i;
                     ram_addr_o <= ram_addr_i;
                     pc_num <= `ZeroWord;
-                end else begin
+                    form_data <= data_o;
+                    read_sta <= 4'h1;
+                    cashhit <= 1'b0;
+                end else if(pc != pcche[pc[`CacheChoose]] || vldche[pc[`CacheChoose]] == 1'b0) begin
                     mpc <= 1'b0;
+                    cur_done <= 1'b0;
+                    ram_busy <= 1'b1;
                     addr_i <= pc;
                     pc_num <= pc;
                     ram_addr_o <= pc;
+                    form_data <= data_o;
+                    read_sta <= 4'h1;
+                    cashhit <= 1'b0;
+                end else begin
+//                $write("%h\n", pc);
+//                $write("%h\n", instche[pc[`CacheChoose]]);
+                //$display(pc[`CacheChoose]);
+            //    $display(vldche[pc[`CacheChoose]]);
+                    cashhit <= 1'b1;
+                    mpc <= 1'b0;
+                    cur_done <= 1'b1;
+                    ram_busy <= 1'b0;
+                    addr_i <= pc;
+                    pc_num <= pc;
+                    ram_addr_o <= pc;
+                    form_data <= instche[pc[`CacheChoose]];
+            //        end
                 end
 
-                read_sta <= 4'h1;
+
             end
             4'h1: begin
                 //ram_busy <= 1'b1;
                 //data_o[7:0] <= din;
                 //cur_done <= 1'b0;
                 //ram_done <= 1'b0;
+                form_data <= data_o;
                 if(addr_i == 32'h30000) begin
                     cur_done <= 1'b1;
                     ram_addr_o <= pc;
@@ -261,6 +300,7 @@ always @ ( posedge clk ) begin
             4'h2: begin
                 //ram_busy = 1'b1;
                 //data_o[15:8] <= din;
+                form_data <= data_o;
                 ram_addr_o <= addr_i + 2;
                 read_sta <= read_sta + 1;
             end
@@ -271,6 +311,7 @@ always @ ( posedge clk ) begin
             //    ram_done <= 1'b0;
                 ram_addr_o <= addr_i + 3;
                 read_sta <= read_sta + 1;
+                form_data <= data_o;
             end
             4'h4: begin
                 ram_busy <= 1'b0;
@@ -280,6 +321,7 @@ always @ ( posedge clk ) begin
                 //ram_done <= 1'b0;
                 read_sta <= read_sta + 1;
                 ram_addr_o <= addr_i + 3;
+                form_data <= data_o;
                 /*if(!mpc) begin
                     ram_done <= 1'b0;
                     pc_done <= 1'b1;
@@ -293,13 +335,16 @@ always @ ( posedge clk ) begin
                 end*/
             end
             default: begin
+                form_data <= data_o;
             end
         endcase
     end
 end
 
 always @ ( * ) begin
-    if(!cpu_wr) begin
+    if(cashhit == 1'b1) begin
+        data_o = form_data;
+    end else if(!cpu_wr) begin
         case(read_sta)
             4'h2: begin
                 data_o[7:0] = din;
@@ -355,6 +400,8 @@ always @ ( * ) begin
             pc_done = 1'b1;
             inst_o = data_o;
             ram_r_data_o = `ZeroWord;
+        //    if(cashhit == 1'b1)
+        //        $write("%h\n\n", inst_o);
         end else begin
             ram_done = 1'b1;
             pc_done = 1'b0;
@@ -369,5 +416,12 @@ always @ ( * ) begin
     end
 end
 
+always @ ( negedge clk ) begin
+    if(pc_done == 1'b1) begin
+        pcche[pc_num[`CacheChoose]] <= pc_num;
+        instche[pc_num[`CacheChoose]] <= inst_o;
+//        vldche[pc_num[`CacheChoose]] <= 1'b1;
+    end
+end
 
 endmodule // mem_ctrl

@@ -104,6 +104,8 @@ wire[`InstBus] if_inst;
 wire[`InstAddrBus] mectrl_pc;
 wire[`InstAddrBus] if_pc;
 
+wire ex_ld_flag;
+
 assign dbgreg_dout = pc;
 
 stall_ctrl stall_ctrl0(
@@ -175,6 +177,7 @@ id id0(
     .reg1_data_i(reg1_data),
     .reg2_data_i(reg2_data),
 
+    .ex_ld_flag(ex_ld_flag),
     .ex_wreg_i(ex_wreg_o),
     .ex_wdata_i(ex_wdata_o),
     .ex_wd_i(ex_wd_o),
@@ -261,7 +264,8 @@ ex ex0(
     .b_flag_o(ex_b_flag),
     .b_target_o(ex_b_target),
     .aluop_o(ex_aluop_o),
-    .mem_addr_o(mem_addr)
+    .mem_addr_o(mem_addr),
+    .is_ld(ex_ld_flag)
 );
 
 ex_mem ex_mem0(

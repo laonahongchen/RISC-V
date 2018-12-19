@@ -590,7 +590,7 @@ always @ ( * ) begin
     if(rst == `RstEnable) begin
         reg1_o = `ZeroWord;
         r1_stall = 1'b0;
-    end else if ((reg1_read_o == 1'b1) && (ex_ld_flag) && (ex_wd_i == reg1_addr_o)) begin
+    end else if ((reg1_read_o == 1'b1) && (ex_ld_flag == 1'b1) && (ex_wd_i == reg1_addr_o)) begin
         reg1_o = `ZeroWord;
         r1_stall = 1'b1;
     end else if ((reg1_read_o == 1'b1) && (ex_wreg_i == 1'b1) && (ex_wd_i == reg1_addr_o)) begin

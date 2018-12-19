@@ -53,7 +53,7 @@ always @ ( negedge clk ) begin
     end else if (id_b_flag_i) begin
         if(stall[0] == `NoStop) begin
             next_jump <= 1'b0;
-            target_addr <= id_b_target_i;
+            pc <= id_b_target_i;
         end else begin
             next_jump <= 1'b1;
             target_addr <= id_b_target_i;
@@ -61,7 +61,7 @@ always @ ( negedge clk ) begin
     end else if(ex_b_flag_i) begin
         if(stall[0] == `NoStop) begin
             next_jump <= 1'b0;
-            target_addr <= ex_b_target_i;
+            pc <= ex_b_target_i;
         end else begin
             next_jump <= 1'b1;
             target_addr <= ex_b_target_i;

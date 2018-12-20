@@ -9,7 +9,7 @@ module mem_ctrl (
     input wire[`InstAddrBus] pc,
     //input wire[7:0] cpu_data_i,
     input wire[7:0] din,
-    input wire[`StallBus] stall,
+//    input wire[`StallBus] stall,
     input wire rdy_in,
 
     output reg cpu_wr,
@@ -24,7 +24,7 @@ module mem_ctrl (
     output reg[`InstBus] inst_o
 );
 
-reg[3:0] read_sta;
+reg[2:0] read_sta;
 //reg read_enable;
 reg mpc;
 reg cur_done;
@@ -87,7 +87,7 @@ always @ ( posedge clk ) begin
     //cur_done <= 1'b0;
     //ram_done <= 1'b0;
     if(rst == `RstEnable) begin
-        read_sta <= 4'h0;
+        read_sta <= 3'h0;
         ram_busy <= 1'b1;
         cpu_wr <= 1'b0;
         cur_done <= 1'b0;
@@ -197,7 +197,7 @@ always @ ( posedge clk ) begin
         form_data <= ram_data_i;
         case (ram_mask_i)
             2'b01: begin
-                inreg <= 1'b1;
+            //    inreg <= 1'b1;
                 cur_done <= 1'b1;
                 mpc <= 1'b1;
             //    ram_done <= 1'b0;
@@ -340,7 +340,9 @@ always @ ( posedge clk ) begin
 end
 
 always @ ( * ) begin
-    if(cashhit == 1'b1) begin
+    if(rst == `RstEnable) begin
+        data_o = `ZeroWord;
+    end else if(cashhit == 1'b1) begin
         data_o = form_data;
     end else if(!cpu_wr) begin
         case(read_sta)

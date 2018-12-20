@@ -136,7 +136,7 @@ mem_ctrl mem_ctrl0(
     .pc(pc),
     .rdy_in(rdy_in),
     .din(mem_din),
-    .stall(stall),
+//    .stall(stall),
     .cpu_wr(mem_wr),
     .ram_busy(ram_busy),
     .ram_done(ram_done),
@@ -147,15 +147,16 @@ mem_ctrl mem_ctrl0(
     .pc_num(mectrl_pc),
     .inst_o(rom_data_i)
 );
-/*
+
 IF if0(
+    .rst(rst_in),
     .pc(mectrl_pc),
     .inst(rom_data_i),
     .pc_done(pc_done),
     .pc_o(if_pc),
     .inst_o(if_inst),
     .stall_req_o(if_stall_req)
-);*/
+);
 //assign rom_addr_o = pc;
 
 if_id if_id0(

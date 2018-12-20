@@ -4,8 +4,6 @@
 //---------------------Reg ---------------------------------------
 `define RegNum          32
 `define RegNumLog2      5
-`define DoubleRegBus    63:0
-`define DoubleRegWidth  64
 `define RegWidth        32
 `define RegAddrBus      4:0
 `define RegBus          31:0

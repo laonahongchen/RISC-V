@@ -27,7 +27,8 @@ always @ ( posedge clk ) begin
             next_jump <= 1'b1;
         end else if(stall[1] == `Stop) begin
             next_jump <= 1'b1;
-        end else if (stall[1] == `NoStop) begin
+        //end else if (stall[1] == `NoStop) begin
+        end else begin
             id_pc <= `ZeroWord;
             id_inst <= `ZeroWord;
             next_jump <= 1'b0;

@@ -39,7 +39,7 @@ always @ ( * ) begin
         ram_w_data_o = `ZeroWord;
         ram_addr_o = `ZeroWord;
         ram_mask_o = 4'h0;
-    end if(aluop_i == `ME_NOP_OP)begin
+    end else if(aluop_i == `ME_NOP_OP)begin
         //case(aluop_i)
             //`ME_NOP_OP: begin
                 wd_o = wd_i;

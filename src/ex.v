@@ -98,7 +98,7 @@ end
 
 always @ ( * ) begin
     if(rst == `RstEnable) begin
-        shiftout <= `ZeroWord;
+        shiftout = `ZeroWord;
     end else begin
         case(aluop_i)
             `EX_SLL_OP: begin
@@ -143,7 +143,7 @@ end
 
 always @ ( * ) begin
     if(rst == `RstEnable) begin
-        arithout <= `ZeroWord;
+        arithout = `ZeroWord;
     end else begin
         case(aluop_i)
             `EX_ADD_OP: begin
@@ -172,9 +172,9 @@ end
 
 always @ ( * ) begin
     if(wreg_i && !wd_i) begin
-        wd_o <= `ZeroWord;
-        wreg_o <= `WriteDisable;
-        wdata_o <= `ZeroWord;
+        wd_o = `ZeroWord;
+        wreg_o = `WriteDisable;
+        wdata_o = `ZeroWord;
         aluop_o = `ME_NOP_OP;
     end else begin
         wd_o = wd_i;

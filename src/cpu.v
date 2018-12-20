@@ -147,7 +147,7 @@ mem_ctrl mem_ctrl0(
     .pc_num(mectrl_pc),
     .inst_o(rom_data_i)
 );
-
+/*
 IF if0(
     .pc(mectrl_pc),
     .inst(rom_data_i),
@@ -155,7 +155,7 @@ IF if0(
     .pc_o(if_pc),
     .inst_o(if_inst),
     .stall_req_o(if_stall_req)
-);
+);*/
 //assign rom_addr_o = pc;
 
 if_id if_id0(

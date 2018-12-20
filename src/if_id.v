@@ -21,9 +21,11 @@ always @ ( posedge clk ) begin
         id_inst <= `ZeroWord;
         next_jump <= 1'b0;
     end else if (id_b_flag_i || ex_b_flag_i) begin
-        if(stall[1] == `Stop) begin
+        if(stall[1] == `Stop && stall[2] == `NoStop) begin
             id_pc <= `ZeroWord;
             id_inst <= `ZeroWord;
+            next_jump <= 1'b1;
+        end else if(stall[1] == `Stop) begin
             next_jump <= 1'b1;
         end else if (stall[1] == `NoStop) begin
             id_pc <= `ZeroWord;

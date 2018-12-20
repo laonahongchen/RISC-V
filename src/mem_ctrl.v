@@ -91,10 +91,8 @@ always @ ( posedge clk ) begin
         ram_busy <= 1'b1;
         cpu_wr <= 1'b0;
         cur_done <= 1'b0;
-        for(i = 0; i < `CacheSize; i = i + 1)
-            vldche[i] = 1'b0;
     //    ram_done <= 1'b0;
-        mpc = 1'b0;
+        mpc <= 1'b0;
         form_data <= data_o;
         cashhit <= 1'b0;
     //    cur_mask <= 2'b00;
@@ -417,10 +415,13 @@ always @ ( * ) begin
 end
 
 always @ ( negedge clk ) begin
-    if(pc_done == 1'b1) begin
+    if(rst == `RstEnable) begin
+        for(i = 0; i < `CacheSize; i = i + 1)
+            vldche[i] <= 1'b0;
+    end else if(pc_done == 1'b1) begin
         pcche[pc_num[`CacheChoose]] <= pc_num;
         instche[pc_num[`CacheChoose]] <= inst_o;
-//        vldche[pc_num[`CacheChoose]] <= 1'b1;
+        vldche[pc_num[`CacheChoose]] <= 1'b1;
     end
 end
 

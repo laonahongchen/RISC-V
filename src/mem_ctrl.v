@@ -35,10 +35,15 @@ reg[1:0] cur_mask;
 reg inreg;
 reg fmask;
 
-reg[`InstAddrBus] pcche[0:`CacheSize - 1];
-reg[`InstBus] instche[0:`CacheSize - 1];
-reg vldche[0:`CacheSize - 1];
+reg[`InstAddrBus] pcche[`CacheSize - 1:0];
+reg[`InstBus] instche[`CacheSize - 1:0];
+reg vldche[`CacheSize - 1:0];
 
+reg[`InstAddrBus] pcche1[`CacheSize - 1:0];
+reg[`InstBus] instche1[`CacheSize - 1:0];
+reg vldche1[`CacheSize - 1:0];
+
+reg [`CacheSize - 1:0] lruchoose;
 
 /*
 always @ ( * ) begin
@@ -93,7 +98,8 @@ always @ ( posedge clk ) begin
         cur_done <= 1'b0;
     //    ram_done <= 1'b0;
         mpc <= 1'b0;
-        form_data <= data_o;
+        form_data <= `ZeroWord;
+        ram_addr_o <= `ZeroWord;
         cashhit <= 1'b0;
     //    cur_mask <= 2'b00;
     end else if (!rdy_in) begin
@@ -116,16 +122,16 @@ always @ ( posedge clk ) begin
         case(cur_mask)
             2'b10: begin
                 case (read_sta)
-                    4'h0,4'h5: begin
+                /*    4'h0,4'h5: begin
                         ram_busy <= 1'b1;
                         cur_done <= 1'b0;
                 //        ram_done <= 1'b0;
-                        data_o <= ram_data_i;
+                //        data_o <= ram_data_i;
                         addr_i <= ram_addr_i;
                         ram_addr_o <= ram_addr_i;
                         cpu_data_o <= ram_data_i[7:0];
                         read_sta <= 4'h1;
-                    end
+                    end*/
                     4'h1: begin
                         ram_busy <= 1'b0;
                         cur_done <= 1'b1;
@@ -145,16 +151,16 @@ always @ ( posedge clk ) begin
             end
             2'b11: begin
                 case (read_sta)
-                    4'h0,4'h5: begin
+                /*    4'h0,4'h5: begin
                         ram_busy <= 1'b1;
                 //        ram_done <= 1'b0;
                         cur_done <= 1'b0;
-                        data_o <= ram_data_i;
+                //        data_o <= ram_data_i;
                         addr_i <= ram_addr_i;
                         ram_addr_o <= ram_addr_i;
                         cpu_data_o <= ram_data_i[7:0];
                         read_sta <= 4'h1;
-                    end
+                    end*/
                     4'h1: begin
                         cur_done <= 1'b0;
                 //        ram_done <= 1'b0;
@@ -252,7 +258,27 @@ always @ ( posedge clk ) begin
                     form_data <= data_o;
                     read_sta <= 4'h1;
                     cashhit <= 1'b0;
-                end else if(pc != pcche[pc[`CacheChoose]] || vldche[pc[`CacheChoose]] == 1'b0) begin
+                end else if(pc == pcche[pc[`CacheChoose]] && vldche[pc[`CacheChoose]] == 1'b1) begin
+                    cashhit <= 1'b1;
+                    mpc <= 1'b0;
+                    cur_done <= 1'b1;
+                    ram_busy <= 1'b0;
+                    addr_i <= pc;
+                    pc_num <= pc;
+                    ram_addr_o <= pc;
+                    form_data <= instche[pc[`CacheChoose]];
+                //    lruchoose[pc[`CacheChoose]] = 1'b0;
+                end else if(pc == pcche1[pc[`CacheChoose]] && vldche1[pc[`CacheChoose]] == 1'b1) begin
+                    cashhit <= 1'b1;
+                    mpc <= 1'b0;
+                    cur_done <= 1'b1;
+                    ram_busy <= 1'b0;
+                    addr_i <= pc;
+                    pc_num <= pc;
+                    ram_addr_o <= pc;
+                    form_data <= instche1[pc[`CacheChoose]];
+                //    lruchoose[pc[`CacheChoose]] = 1'b1;
+                end else begin
                     mpc <= 1'b0;
                     cur_done <= 1'b0;
                     ram_busy <= 1'b1;
@@ -262,19 +288,6 @@ always @ ( posedge clk ) begin
                     form_data <= data_o;
                     read_sta <= 4'h1;
                     cashhit <= 1'b0;
-                end else begin
-//                $write("%h\n", pc);
-//                $write("%h\n", instche[pc[`CacheChoose]]);
-                //$display(pc[`CacheChoose]);
-            //    $display(vldche[pc[`CacheChoose]]);
-                    cashhit <= 1'b1;
-                    mpc <= 1'b0;
-                    cur_done <= 1'b1;
-                    ram_busy <= 1'b0;
-                    addr_i <= pc;
-                    pc_num <= pc;
-                    ram_addr_o <= pc;
-                    form_data <= instche[pc[`CacheChoose]];
             //        end
                 end
 
@@ -419,12 +432,49 @@ end
 
 always @ ( negedge clk ) begin
     if(rst == `RstEnable) begin
-        for(i = 0; i < `CacheSize; i = i + 1)
+        for(i = 0; i < `CacheSize; i = i + 1) begin
             vldche[i] <= 1'b0;
+            pcche[i] <= `ZeroWord;
+            instche[i] <= `ZeroWord;
+            vldche1[i] <= 1'b0;
+            pcche1[i] <= `ZeroWord;
+            instche1[i] <= `ZeroWord;
+        end
     end else if(pc_done == 1'b1) begin
-        pcche[pc_num[`CacheChoose]] <= pc_num;
-        instche[pc_num[`CacheChoose]] <= inst_o;
-        vldche[pc_num[`CacheChoose]] <= 1'b1;
+        if(pcche1[pc_num[`CacheChoose]] == pc_num) begin
+            lruchoose[pc_num[`CacheChoose]] <= 1'b1;
+        end else if(pcche[pc_num[`CacheChoose]] == pc_num) begin
+            lruchoose[pc_num[`CacheChoose]] <= 1'b0;
+        end else if(lruchoose[pc_num[`CacheChoose]] == 1'b1) begin
+            pcche[pc_num[`CacheChoose]] <= pc_num;
+            instche[pc_num[`CacheChoose]] <= inst_o;
+            vldche[pc_num[`CacheChoose]] <= 1'b1;
+            lruchoose[pc_num[`CacheChoose]] <= 1'b0;
+        end else begin
+            pcche1[pc_num[`CacheChoose]] <= pc_num;
+            instche1[pc_num[`CacheChoose]] <= inst_o;
+            vldche1[pc_num[`CacheChoose]] <= 1'b1;
+            lruchoose[pc_num[`CacheChoose]] <= 1'b1;
+        end
+        /*if(lruchoose[pc_num[`CacheChoose]] == 1'b1) begin
+            if(pcche1[pc_num[`CacheChoose]] != pc_num) begin
+                pcche[pc_num[`CacheChoose]] <= pc_num;
+                instche[pc_num[`CacheChoose]] <= inst_o;
+                vldche[pc_num[`CacheChoose]] <= 1'b1;
+                lruchoose[pc_num[`CacheChoose]] <= 1'b0;
+            end else begin
+                lruchoose[pc_num[`CacheChoose]] <= 1'b1;
+            end
+        end else begin
+            if(pcche[pc_num[`CacheChoose]] != pc_num) begin
+                pcche1[pc_num[`CacheChoose]] <= pc_num;
+                instche1[pc_num[`CacheChoose]] <= inst_o;
+                vldche1[pc_num[`CacheChoose]] <= 1'b1;
+                lruchoose[pc_num[`CacheChoose]] <= 1'b1;
+            end else begin
+                lruchoose[pc_num[`CacheChoose]] <= 1'b0;
+            end
+        end*/
     end
 end
 

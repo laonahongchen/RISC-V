@@ -27,6 +27,9 @@ module cpu(
 // - 0x30004 read: read clocks passed since cpu starts (in dword, 4 bytes)
 // - 0x30004 write: indicates program stop (will output '\0' through uart tx)
 
+wire dbgrst;
+assign dbgrst = rst_in | (~rdy_in);
+
 
 wire[`InstAddrBus] pc;
 wire[`InstAddrBus] id_pc_i;
@@ -107,6 +110,8 @@ wire[`InstAddrBus] if_pc;
 wire ex_ld_flag;
 
 assign dbgreg_dout = pc;
+
+`define rst_in dbgrst
 
 stall_ctrl stall_ctrl0(
     .rst(rst_in),
@@ -324,6 +329,8 @@ mem_wb mem_wb0(
     .wb_wreg(wb_wreg_i),
     .wb_wdata(wb_wdata_i)
 );
+
+`undef rst_in
 
 /*always @(posedge clk_in)
   begin

@@ -17,7 +17,7 @@ module regfile (
     output reg[`RegBus] rdata2
 );
 
-reg[`RegBus] regs[0:`RegNum - 1];
+reg[`RegBus] regs[`RegNum - 1:0];
 
 integer i;
 

@@ -50,6 +50,7 @@ always @ ( negedge clk ) begin
     if (rst == `RstEnable)  begin
         pc <= `ZeroWord;
         next_jump <= 1'b0;
+        target_addr <= `ZeroWord;
     end else if(ex_b_flag_i) begin
         if(stall[0] == `NoStop) begin
             next_jump <= 1'b0;

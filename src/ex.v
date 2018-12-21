@@ -29,7 +29,9 @@ reg[`RegBus] logicout;
 reg[`RegBus] shiftout;
 reg[`RegBus] arithout;
 reg[`RegBus] pcout;
-reg[`RegBus] sumres;
+wire[`RegBus] sumres;
+
+assign sumres = reg1_i + reg2_i;
 
 always @ ( * ) begin
     stall_req_o = 1'b0;
@@ -40,7 +42,7 @@ always @ ( * ) begin
         case (aluop_i)
             `EX_JALR_OP: begin
                 b_flag_o = 1'b1;
-                sumres = reg1_i + reg2_i;
+                //sumres = reg1_i + reg2_i;
                 b_target_o = {sumres[31:1], 1'b0};
             end
             `EX_BNE_OP:  begin

@@ -101,6 +101,7 @@ always @ ( posedge clk ) begin
         cpu_wr <= 1'b0;
         cur_done <= 1'b0;
         cashhit <= 1'b0;
+        ram_addr_o <= `ZeroWord;
     //    ram_done <= 1'b0;
         form_data <= data_o;
     //end

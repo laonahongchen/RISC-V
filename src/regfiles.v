@@ -19,17 +19,19 @@ module regfile (
 
 reg[`RegBus] regs[0:`RegNum - 1];
 
+integer i;
+
 always @ ( posedge clk ) begin
     if(rst  == `RstDisable) begin
         if((we == `WriteEnable) && (waddr != `RegNumLog2'h0)) begin
             regs[waddr] <= wdata;
         end
     end else begin
-        regs[0] = 1'b0;
+        //regs[0] <= 1'b0;
+        for(i = 0; i < `RegNum; i = i + 1)
+            regs[i] = 1'b0;
     end
 end
-
-integer i;
 
 always @ ( * ) begin
     if (rst == `RstEnable ) begin

@@ -34,7 +34,7 @@ module id (
 
     output reg                  b_flag_o,
     output reg[`InstAddrBus]    b_target_o,
-    output reg                  stall_req_o
+    output wire                 stall_req_o
 );
 
 wire[6:0] opcode =  inst_i[6:0];
@@ -635,10 +635,13 @@ always @ ( * ) begin
         r2_stall = 1'b0;
     end
 end
-
+/*
 always @ ( * ) begin
     stall_req_o = r1_stall | r2_stall;
 end
+*/
+
+assign stall_req_o = r1_stall | r2_stall;
 
 always @ ( * ) begin
     if(rst == `RstEnable) begin

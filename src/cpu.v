@@ -111,7 +111,7 @@ wire ex_ld_flag;
 
 assign dbgreg_dout = pc;
 
-`define rst_in dbgrst
+//`define rst_in dbgrst
 
 stall_ctrl stall_ctrl0(
     .rst(rst_in),
@@ -330,7 +330,7 @@ mem_wb mem_wb0(
     .wb_wdata(wb_wdata_i)
 );
 
-`undef rst_in
+//`undef rst_in
 
 /*always @(posedge clk_in)
   begin

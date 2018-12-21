@@ -150,9 +150,11 @@
 `define InstAddrBus     31:0
 `define InstBus         31:0
 `define MemBus          31:0
-//`define CacheBus        5
-`define CacheSize       16
-`define CacheChoose     5:2
+`define CacheSize       32
+`define CacheBus        10:0
+`define RestChoose      17:7
+`define CacheChoose     6:2
+`define CacheClear      11'b11000000000
 
 //---------------------Stall -------------------------------------
 `define StallReq        1'b1

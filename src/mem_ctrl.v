@@ -31,6 +31,7 @@ reg cur_done;
 reg[`InstAddrBus] addr_i;
 reg[`RegBus] data_o;
 reg[`RegBus] form_data;
+//reg[`RegBus] fdata;
 reg[1:0] cur_mask;
 reg inreg;
 reg fmask;
@@ -50,9 +51,44 @@ wire[4:0] pcc;
 assign pcc = pc[`CacheChoose];
 
 reg cashhit;
+reg cashhit0;
+reg cashhit1;
+//assign cashhit = cashhit0 | cashhit1;
+reg firstwrite;
+
+reg[1:0] data_type;
+
 integer i;
 
+wire cshit;
+assign cshit = cashhit0 | cashhit1;
+
+always @ ( * ) begin
+    if(rst == 1'b0 && pcche[pcc] == pc[`RestChoose]) begin
+        cashhit0 = 1'b1;
+    end else begin
+        cashhit0 = 1'b0;
+    end
+end
+
+always @ ( * ) begin
+    if(rst == 1'b0 && pcche1[pcc] == pc[`RestChoose]) begin
+        cashhit1 = 1'b1;
+    end else begin
+        cashhit1 = 1'b0;
+    end
+end
+
+always @ ( * ) begin
+    if(rst == 1'b0 && (read_sta == 4'h0 || read_sta == 4'h5) && ram_w_enable_i == `WriteEnable) begin
+        firstwrite = 1'b1;
+    end else begin
+        firstwrite = 1'b0;
+    end
+end
+
 always @ ( posedge clk ) begin
+    //fdata <= data_o;
     if(rst == `RstEnable) begin
         read_sta <= 3'h0;
         ram_busy <= 1'b1;
@@ -60,25 +96,25 @@ always @ ( posedge clk ) begin
         cur_done <= 1'b0;
     //    ram_done <= 1'b0;
         mpc <= 1'b0;
-        form_data <= `ZeroWord;
+    //    form_data <= `ZeroWord;
         ram_addr_o <= `ZeroWord;
-        cashhit <= 1'b0;
+    //    cashhit <= 1'b0;
     //    cur_mask <= 2'b00;
     end else if (!rdy_in) begin
         ram_busy <= 1'b1;
         cpu_wr <= 1'b0;
         cur_done <= 1'b0;
-        cashhit <= 1'b0;
+    //    cashhit <= 1'b0;
         ram_addr_o <= `ZeroWord;
     //    ram_done <= 1'b0;
-        form_data <= data_o;
+    //    form_data <= data_o;
     //end
     end else if (read_sta != 4'h0 && read_sta != 4'h5) begin
         if(cpu_wr == 1'b1) begin
     //end else if ((cpu_wr == 1'b1 && read_sta != 4'h0 && read_sta != 4'h5)) begin
             cpu_wr <= 1'b1;
-            cashhit <= 1'b0;
-            form_data <= data_o;
+        //    cashhit <= 1'b0;
+    //        form_data <= data_o;
         //    if(cur_mask == 2'b00)
         //        cur_mask <= ram_mask_i;
             //$display("write start");
@@ -133,7 +169,7 @@ always @ ( posedge clk ) begin
         end else begin
             case (read_sta)
                 4'h1: begin
-                    form_data <= data_o;
+                //    form_data <= data_o;
                     if(addr_i[17:16] == 2'b11) begin
                         cur_done <= 1'b1;
                         ram_addr_o <= addr_i;
@@ -147,7 +183,7 @@ always @ ( posedge clk ) begin
                 4'h2: begin
                     //ram_busy = 1'b1;
                     //data_o[15:8] <= din;
-                    form_data <= data_o;
+                //    form_data <= data_o;
                     ram_addr_o <= addr_i + 2;
                     read_sta <= read_sta + 1;
                 end
@@ -158,25 +194,25 @@ always @ ( posedge clk ) begin
                 //    ram_done <= 1'b0;
                     ram_addr_o <= addr_i + 3;
                     read_sta <= read_sta + 1;
-                    form_data <= data_o;
+                //    form_data <= data_o;
                 end
                 4'h4: begin
                     ram_busy <= 1'b0;
                     cur_done <= 1'b1;
                     read_sta <= read_sta + 1;
                     ram_addr_o <= addr_i + 3;
-                    form_data <= data_o;
+                //    form_data <= data_o;
 
                 end
                 default: begin
-                    form_data <= data_o;
+                //    form_data <= data_o;
                 end
             endcase
         end
     end else if(ram_w_enable_i == `WriteEnable) begin
-        cashhit <= 1'b0;
+        //cashhit <= 1'b0;
         cpu_wr <= 1'b1;
-        form_data <= ram_data_i;
+        //form_data <= ram_data_i;
         case (ram_mask_i)
             2'b01: begin
             //    inreg <= 1'b1;
@@ -224,43 +260,75 @@ always @ ( posedge clk ) begin
             addr_i <= ram_addr_i;
             ram_addr_o <= ram_addr_i;
             pc_num <= `ZeroWord;
-            form_data <= data_o;
+        //    form_data <= data_o;
             read_sta <= 4'h1;
-            cashhit <= 1'b0;
+        //    cashhit <= 1'b0;
         end else  begin
             mpc <= 1'b0;
             addr_i <= pc;
             pc_num <= pc;
             ram_addr_o <= pc;
-            case (pc[`RestChoose])
+            /*case (pc[`RestChoose])
                 pcche[pcc]: begin
                     cur_done <= 1'b1;
                     ram_busy <= 1'b0;
-                    form_data <= instche[pc[`CacheChoose]];
+        //            form_data <= instche[pc[`CacheChoose]];
                     cashhit <= 1'b1;
                 end
                 pcche1[pcc]: begin
                     cur_done <= 1'b1;
                     ram_busy <= 1'b0;
-                    form_data <= instche1[pc[`CacheChoose]];
-                    cashhit <= 1'b1;
+        //            form_data <= instche1[pc[`CacheChoose]];
+        //            cashhit <= 1'b1;
                 end
                 default: begin
                     cur_done <= 1'b0;
                     ram_busy <= 1'b1;
                     read_sta <= 4'b1;
-                    form_data <= data_o;
-                    cashhit <= 1'b0;
+        //            form_data <= data_o;
+        //            cashhit <= 1'b0;
                 end
-            endcase
+            endcase*/
+            if(cshit) begin
+                cur_done <= 1'b1;
+                ram_busy <= 1'b0;
+            end else begin
+                read_sta <= 4'b1;
+                cur_done <= 1'b0;
+                ram_busy <= 1'b1;
+            end
         end
     end
+    if(rst == `RstEnable) begin
+        form_data <= `ZeroWord;
+    end else if(firstwrite == 1'b1)begin
+        form_data <= ram_data_i;
+    end else if(cashhit0 == 1'b1 && (read_sta == 4'h0 || read_sta == 4'h5)) begin
+        form_data <= instche[pcc];
+    end else if(cashhit1 == 1'b1 && (read_sta == 4'h0 || read_sta == 4'h5)) begin
+        form_data <= instche1[pcc];
+    end else begin
+        form_data <= data_o;
+    end
+    cashhit <= cashhit0 | cashhit1;
 end
+/*
+always @ ( * ) begin
+    if(rst == `RstEnable) begin
+        form_data <= `ZeroWord;
+    end else if(cashhit0 == 1'b1) begin
+        form_data = instche[pcc];
+    end else if(cashhit1 == 1'b1) begin
+        form_data = instche1[pcc];
+    end else begin
+        form_data = fdata;
+    end
+end*/
 
 always @ ( * ) begin
     if(rst == `RstEnable) begin
         data_o = `ZeroWord;
-    end else if(cashhit == 1'b1) begin
+    end else if(cashhit == 1'b1 && (read_sta == 4'h0 || read_sta == 4'h5) && mpc == 1'b0) begin
         data_o = form_data;
     end else if(!cpu_wr) begin
         case(read_sta)

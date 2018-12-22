@@ -271,17 +271,20 @@ always @ ( posedge clk ) begin
                             cur_done <= 1'b1;
                             ram_busy <= 1'b0;
                             form_data <= instche[pc[`CacheChoose]];
+                            cashhit <= 1'b1;
                         end
                         pcche1[pcc]: begin
                             cur_done <= 1'b1;
                             ram_busy <= 1'b0;
-                            form_data <= instche[pc[`CacheChoose]];
+                            form_data <= instche1[pc[`CacheChoose]];
+                            cashhit <= 1'b1;
                         end
                         default: begin
                             cur_done <= 1'b0;
                             ram_busy <= 1'b1;
                             read_sta <= 4'b1;
                             form_data <= data_o;
+                            cashhit <= 1'b0;
                         end
                     endcase
                 end
@@ -468,17 +471,19 @@ always @ ( negedge clk ) begin
             instche1[i] <= `ZeroWord;
         end
     end else if(pc_done == 1'b1) begin
-        if(pcche1[pc_num[`CacheChoose]] == pc_num) begin
+        if(pcche1[pc_num[`CacheChoose]] == pc_num[`RestChoose]) begin
             lruchoose[pc_num[`CacheChoose]] <= 1'b1;
-        end else if(pcche[pc_num[`CacheChoose]] == pc_num) begin
+        //    instche1[pc_num[`CacheChoose]] <= inst_o;
+        end else if(pcche[pc_num[`CacheChoose]] == pc_num[`RestChoose]) begin
             lruchoose[pc_num[`CacheChoose]] <= 1'b0;
+        //    instche[pc_num[`CacheChoose]] <= inst_o;
         end else if(lruchoose[pc_num[`CacheChoose]] == 1'b1) begin
-            pcche[pc_num[`CacheChoose]] <= pc_num;
+            pcche[pc_num[`CacheChoose]] <= pc_num[`RestChoose];
             instche[pc_num[`CacheChoose]] <= inst_o;
         //    vldche[pc_num[`CacheChoose]] <= 1'b1;
             lruchoose[pc_num[`CacheChoose]] <= 1'b0;
         end else begin
-            pcche1[pc_num[`CacheChoose]] <= pc_num;
+            pcche1[pc_num[`CacheChoose]] <= pc_num[`RestChoose];
             instche1[pc_num[`CacheChoose]] <= inst_o;
         //    vldche1[pc_num[`CacheChoose]] <= 1'b1;
             lruchoose[pc_num[`CacheChoose]] <= 1'b1;

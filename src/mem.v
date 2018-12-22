@@ -70,7 +70,7 @@ always @ ( * ) begin
             stall_req_o = 1'b0;
             case(aluop_i)
                 `EX_LB_OP: begin
-                    if(ram_addr_i == 32'h30000) begin
+                    if(ram_addr_i[17:16] == 2'b11) begin
                         wdata_o = {{24{ram_r_data_i[31]}},ram_r_data_i[31:24]};
                     end else  begin
                         case (ram_addr_i[1:0])
@@ -109,7 +109,7 @@ always @ ( * ) begin
                     wdata_o = ram_r_data_i;
                 end
                 `EX_LBU_OP: begin
-                    if(ram_addr_i == 32'h30000) begin
+                    if(ram_addr_i[17:16] == 2'b11) begin
                         wdata_o = {{24{1'b0}},ram_r_data_i[31:24]};
                     end else begin
                         case (ram_addr_i[1:0])
@@ -154,7 +154,11 @@ always @ ( * ) begin
             case(aluop_i)
                 `EX_LW_OP,`EX_LH_OP,`EX_LB_OP,`EX_LHU_OP,`EX_LBU_OP: begin
                     ram_r_enable_o = `WriteEnable;
-                    ram_addr_o = {ram_addr_i[31:2],2'b00};
+                    if(ram_addr_i[17:16] == 2'b11) begin
+                        ram_addr_o = ram_addr_i;
+                    end else begin
+                        ram_addr_o = {ram_addr_i[31:2],2'b00};
+                    end
                 end
                 `EX_SB_OP: begin
                     ram_w_enable_o = `WriteEnable;

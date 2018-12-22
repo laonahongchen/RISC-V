@@ -34,12 +34,20 @@ int main() {
     for (i = 1; i <= n; i++)
         a[i] = n + 1 - i;
     qsrt(1, n);
-    for (i = 1; i <= n; i++) {
+	int j;
+	//int x = 1;
+    for (j = 1; j <= n; j++) {
+		//if(j % 1000 != 0)
+			//continue;
+		i = j;
 		outl(a[i]);
 		print(" ");
         sleep(1); // to prevent UART buffer from overflowing
+		//for(j = 1; j <= 1000000; ++j)
+			//x = x + (j & (j - 1));
 	}
     print("\n");
+	
     return 0;
 }
 

@@ -87,13 +87,8 @@ always @ ( * ) begin
     end
 end
 
-reg cshit0_delay;
-reg cshit1_delay;
-
 always @ ( posedge clk ) begin
     //fdata <= data_o;
-    cshit0_delay <= cashhit0;
-    cshit1_delay <= cashhit1;
     if(rst == `RstEnable) begin
         read_sta <= 3'h0;
         ram_busy <= 1'b1;
@@ -399,9 +394,9 @@ always @ ( negedge clk ) begin
             instche1[i] <= `ZeroWord;
         end
     end else if(pc_done == 1'b1) begin
-        if(cshit1_delay == 1'b1) begin
+        if(pcche1[pc_num[`CacheChoose]] == pc_num[`RestChoose]) begin
             lruchoose[pc_num[`CacheChoose]] <= 1'b1;
-        end else if(cshit0_delay == 1'b0) begin
+        end else if(pcche[pc_num[`CacheChoose]] == pc_num[`RestChoose]) begin
             lruchoose[pc_num[`CacheChoose]] <= 1'b0;
         end else if(lruchoose[pc_num[`CacheChoose]] == 1'b1) begin
             pcche[pc_num[`CacheChoose]] <= pc_num[`RestChoose];

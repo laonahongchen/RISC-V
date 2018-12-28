@@ -40,6 +40,10 @@ always @ ( * ) begin
         b_target_o = `ZeroWord;
     end else begin
         case (aluop_i)
+        /*    `EX_JAL_OP: begin
+                b_flag_o = 1'b1;
+                b_target_o = pc_i + offset_i;
+            end*/
             `EX_JALR_OP: begin
                 b_flag_o = 1'b1;
                 //sumres = reg1_i + reg2_i;

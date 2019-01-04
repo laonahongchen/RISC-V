@@ -93,16 +93,36 @@ ISA                         & RISC-V(subset) \\
 Cache                       & 2-way set associate I-cache\\
 Branch Prediction           & static branch prediction which always predict not jump\\
 FPGA Support                & Yes\\
+Speed                       & 100Mhz 1.6s for pi.c*\\
  \bottomrule
 \end{tabular}
 \end{table}
+
+[*]: When running 100Mhz on FPGA, it has timing failed problem , but it still run pretty good.
+
+\iffalse
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\multicolumn{1}{c}{Speed} & \multicolumn{1}{c}{RISC-V CPU}                                                                        \\ \midrule
+ISA                         & RISC-V(subset) \\
+Cache                       & 2-way set associate I-cache\\
+Branch Prediction           & static branch prediction which always predict not jump\\
+FPGA Support                & Yes\\
+ \bottomrule
+\end{tabular}
+\end{table}
+
+\fi
 
 \subsection{Specification}
 
 My CPU is a standard 5-stage pipeline CPU which has a memory controller and stall controller. It also have a I-cache  and a static branch prediction for speed up.
 
 \begin{itemize}
-\item For structure hazard, we don't need to face it. For data hazard, I used the forwarding method to solve it. But when facing with LOAD command which I can not get the exactly value of register before MEM stage, I have to stall the pipeline until the former command pass MEM stage. For control hazard, when I found there is a branch prediction fault, I just changed those commands into no-use commands which is actually bubbles.
+\item Considering all hazards. For structure hazard, we don't need to face it. For data hazard, I used the forwarding method to solve it. But when facing with LOAD command which I can not get the exactly value of register before MEM stage, I have to stall the pipeline until the former command pass MEM stage. For control hazard, when I found there is a branch prediction fault, I just changed those commands into no-use commands which is actually bubbles.
 
 \begin{figure}[H]
 	\begin{center}
@@ -116,7 +136,7 @@ My CPU is a standard 5-stage pipeline CPU which has a memory controller and stal
 
 
 
-    \item Although facing with timing failed for 100Mhz in my implementation period, I can run the CPU correctly on the FPGA. The biggest reason is that almost all the timing failed is because I used a few negedge in the CPU, which makes a few route half the tiem permitted, but actually that part is not needed until next negedge for actually running. The only threaten left is the input of those timing failed part may be changed in next posedge, but as far as I calculated, the time spent is mostly on route delay, which makes the new data hard to achieve the former running one before the very small timing failed extras.
+    \item Although facing with timing failed for 100Mhz in my implementation period, I can run the CPU correctly on the FPGA. The biggest reason is that almost all the timing failed is because I have a module using negedge in the CPU, which makes it has less time permitted. I use it in the part that I-cache updating and it should be done before the next posedge otherwise if the new pc is equal to the former pc, it can not hit. It can be fixed by a few code rewriting ( actually special check for this case).
 \end{itemize}
 
 \section{Thinkings about features}
@@ -146,6 +166,6 @@ Special thanks to Linqi Chen (陈林淇) for his guidance to me of how to use Vi
     \item [1.]雷思磊.\emph{自己动手写CPU},电子工业出版社, 2014.
     \item [2.]Zhanghao Wu's (吴章昊) MIPS CPU project.
   	\url{https://github.com/Michaelvll/RISCV_CPU}
-\end{itemize}
+\end{enumerate}
 
 \end{document}

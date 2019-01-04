@@ -1,28 +1,31 @@
 #include "io.h"
-int main()
-{
-    int a[100][100];
-    int i;
-	int j;
-    int sum = 0;
+int f[2801];
+int main() {
+	int a = 10000;
+	int b = 0;
+	int c = 2800;
+	int d = 0;
+	int e = 0;
+	int g = 0;
 
-    for (i = 0;i < 100;i++)
-        for (j = 0;j < 100;j++)
-            a[i][j] = 0;
-    int quotient;
-    int remainder;
-    for (i = 0;i < 100;i++)
-    	if (i > 20 && i < 80) {
-        	for (j = 0;j < 100;j++)
-            	if (j > 5 || i < 90) {
-                    quotient = j * 4 / 100;
-                    remainder = j * 4 % 100;
-                	a[i + quotient][remainder] = j + (100 - 1 + 1 - 1 + 1) / 2;
-                }
-    	}
-
-    for (i = 0;i < 100;i++)
-        for (j = 0;j < 100;j++)
-            sum = sum + a[i][j];
-    outlln(sum);
+	for (;b-c!=0;) 
+		f[b++] = a/5;
+	for (;; e = d%a){
+		d = 0;
+		g = c*2;
+		if (g==0) break;
+		
+		for (b=c;;d=d*b){
+			d=d+f[b]*a;
+			f[b] = d%--g;
+			d=d/g--;
+			if (--b==0) break;
+		}
+		
+		c = c-14;
+		outl(e+d/a);
+	}
+	
+  print("\n");
+  return 0;
 }

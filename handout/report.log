@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99999 (TeX Live 2018/W32TeX) (preloaded format=xelatex 2018.9.14)  28 DEC 2018 23:22
+This is XeTeX, Version 3.14159265-2.6-0.99999 (TeX Live 2018/W32TeX) (preloaded format=xelatex 2018.9.14)  29 DEC 2018 14:54
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -1585,32 +1585,18 @@ File: structure.png Graphic file (type bmp)
 . <->"FangSong/OT:script=hani;language=DFLT;"
 . - 'small caps'  (m/sc) with NFSS spec.: 
 .................................................
-
-
-./report.tex:149: LaTeX Error: \begin{enumerate} on input line 145 ended by \end{itemize}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.149 \end{itemize}
-                   
-Your command was ignored.
-Type  I <command> <return>  to replace it with another command,
-or  <return>  to continue without it.
-
 \tf@thm=\write4
 \openout4 = `report.thm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 151.
-[3]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 151.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 171.
+ [3]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 171.
  (./report.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 151.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 151.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 171.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 171.
 Package rerunfilecheck Info: File `report.out' has not changed.
 (rerunfilecheck)             Checksum: EE64B68E98E2DA1D38C3242790E2B593.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 151.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 171.
  ) 
 Here is how much of TeX's memory you used:
  26206 strings out of 492962
@@ -1619,6 +1605,6 @@ Here is how much of TeX's memory you used:
  29910 multiletter control sequences out of 15000+600000
  540778 words of font info for 85 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 52i,9n,68p,670b,443s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 52i,9n,68p,574b,443s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on report.xdv (3 pages, 35588 bytes).
+Output written on report.xdv (3 pages, 35900 bytes).
